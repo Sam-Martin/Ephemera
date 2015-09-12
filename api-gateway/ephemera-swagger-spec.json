@@ -1,0 +1,160 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Ephemera API",
+        "description": "Submit single-access secrets to the Ephemera API",
+        "version": "1.0.0"
+    },
+    "host": "ephemera.toukakoukan.com",
+    "schemes": [
+        "https"
+    ],
+    "basePath": "/v1",
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/getSecretUploadSignature": {
+            "get": {
+                "summary": "Get signed S3 upload details",
+                "description": "The getSecretUploadSignature endpoint allows you to submit a new secret and will return a unique URL to download that secret once.  \nSee [Browser Uploads to S3 using HTML POST Forms](https://aws.amazon.com/articles/1434) for more.\n",
+                "parameters": [
+                    {
+                        "name": "Content-Type",
+                        "in": "query",
+                        "description": "Mime-type of the file to be uploaded",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Necessary fields to submit a signed S3 upload",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/S3UploadSignature"
+                            }
+                        }, 
+                        "headers": {
+                            "Access-Control-Allow-Headers":{
+                                "description": "Specifies the allowed headers",
+                                "type": "string",
+                                "default": "'Content-Type,X-Amz-Date,Authorization'"
+                            },
+                            "Access-Control-Allow-Methods":{
+                                "description": "Specifies the allowed methods",
+                                "type": "string",
+                                "default": "'GET,POST'"
+                            },
+                            "Access-Control-Allow-Origin":{
+                                "description": "Specifies the allowed origins",
+                                "type": "string",
+                                "default": "'*'"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                },
+                "x-amazon-apigateway-auth" : {
+                    "type" : "none"
+                },
+                "x-amazon-apigateway-integration" : {
+                    "type" : "aws",
+                    "uri" : "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:080863329876:function:ephemera-getsignedurl/invocations",
+                    "httpMethod" : "POST",
+                    "credentials" : "arn:aws:iam::080863329876:role/APIGatewayLambdaExecRole",
+                    "requestTemplates":{
+                        "application/json": "{ \"Content-Type\": \"$input.params('Content-Type')\" }"
+                    },
+                    "requestParameters" : {
+                        "integration.request.path.integrationPathParam" : "method.request.querystring.Content-Type"
+                    },
+                    "cacheNamespace" : "cache-namespace",
+                    "cacheKeyParameters" : [],
+                    "responses" : {
+                        "2//d{2}" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                                "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,X-Amz-Date,Authorization'",
+                                "method.response.header.Access-Control-Allow-Methods" : "'GET,POST'",
+                                "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                            
+                        },
+                        "default" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                                "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,X-Amz-Date,Authorization'",
+                                "method.response.header.Access-Control-Allow-Methods" : "'GET,POST'",
+                                "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                            
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "S3UploadSignature": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string",
+                    "description": "Key name for the file in the s3 bucket, a GUID"
+                },
+                "AWSAccessKeyId": {
+                    "type": "string",
+                    "description": "ID of the access key authenticating the upload"
+                },
+                "acl": {
+                    "type": "string",
+                    "description": "Acl for the uploaded file (always public)"
+                },
+                "success_action_redirect": {
+                    "type": "string",
+                    "description": "The URL the user will be sent to after the upload"
+                },
+                "policy": {
+                    "type": "string",
+                    "description": "A Base64-encoded policy document"
+                },
+                "signature": {
+                    "type": "string",
+                    "description": "The content type (mime type) that will be applied to the uploaded file"
+                },
+                "Content-Type": {
+                    "type": "string",
+                    "description": "A Base64-encoded policy document"
+                }
+            }
+        },
+        "Error": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "fields": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

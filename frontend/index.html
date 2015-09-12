@@ -1,0 +1,47 @@
+<html>
+    <head>
+        <title>Ephemera</title>
+        <!-- Latest jQuery -->
+        <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+        <!-- CSS specific to this page -->
+        <link rel="stylesheet" href="css/amazon-image-upload-test.css">
+
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+        <!-- The main JS for bringing it all together on this page -->
+        <script src="js/main.js"></script>
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="container">
+                <div class="navbar-header"><h3>Ephemera - One Time Password Transfer</h3></div>
+            </div>
+        </nav>
+        <div class="jumbotron">
+            <div class="container text-center">
+                <h1>Secret Upload</h1>
+                <p>Select a file (less than 500k) you wish to upload to be provided with a 1-time use URL to access it.
+            </div>
+        </div>
+        <div class="container">
+            <form id="file-form" action="https://image-upload-smartin.s3.amazonaws.com/" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="key" value="">
+              <input type="hidden" name="AWSAccessKeyId" value=""> 
+              <input type="hidden" name="acl" value=""> 
+              <input type="hidden" name="success_action_redirect" value="">
+              <input type="hidden" name="policy" value="">
+              <input type="hidden" name="signature" value="">
+              <input type="hidden" name="Content-Type" value="">
+
+                <input type="file" name="file" id="file-select"/>
+                <input type="Submit" Value="Submit"/>
+            </form>
+
+        </div>
+    </body>
+</head>

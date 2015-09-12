@@ -1,0 +1,15 @@
+#progress{
+	height:1em;
+	width:20em;
+}
+.preview{
+	max-width:40em;
+	max-height:20em;
+
+}
+.navbar-header > h3{
+	color: white;
+}
+.jumbotron{
+	margin-top: 2em;
+}
