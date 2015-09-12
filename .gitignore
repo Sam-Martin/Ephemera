@@ -1,0 +1,3 @@
+*.zip
+*.secret
+*node_modules
