@@ -39,6 +39,7 @@ module.exports = {
           + '       {"bucket": "' + params.bucketName + '"},'
           + '       {"key": "' + params.bucketKey + '"},'
           + '       {"acl": "' + params.s3ACL + '"},'
+          + '       ["content-length-range",0, 512000],'
           + '       {"success_action_redirect": "' +params.successActionRedirect + '"},'
           + '       {"Content-Type": "' + params.contentType + '"}]\n}';
   },

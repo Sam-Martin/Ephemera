@@ -14,13 +14,18 @@ var s3ACL = 'public-read';
 exports.handler = function(event, context, params) {
     console.log("Loaded handler");
     
-    roleArn = typeof(params) != 'undefined' ? params.roleArn : config.roleArn
+    // Check it's a valid filetype
+    var acceptedFileTypes = ['image/jpeg', 'image/png', 'text/plain', 'image/gif', 'image/pjpeg']
+
+    if(acceptedFileTypes.indexOf(event['Content-Type']) < 0){
+      context.fail("Error: Invalid file type: "+ event['Content-Type'])
+    }
+
 
     // Decrypt the secret key using KMS (you can't sign S3 uploads with roles :()
     var params = {
       CiphertextBlob: new Buffer(config.encryptedSecret, 'base64')
     };
-
     kms.decrypt(params, function(err, data) {
       if (err) context.fail("Error" + JSON.stringify(err.stack));
       else {
@@ -34,7 +39,6 @@ exports.handler = function(event, context, params) {
           s3ACL: config.s3ACL,
           successActionRedirect: event['redirectTo'],
           contentType: event['Content-Type'],
-          roleArn: roleArn,
           context:context
         }
 

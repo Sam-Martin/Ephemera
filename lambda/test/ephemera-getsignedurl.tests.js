@@ -11,7 +11,7 @@ exports.testHandler = function(test){
 			
 			test.equal(json['Content-Type'], 'image/jpeg', "check content type");
 
-			test.equal(json['acl'], 'public-read', "check acl");
+			test.equal(json['acl'], 'private', "check acl");
 			
 			test.ok(/[a-z0-9\-]*/.test(json['key']), "check key");
 
@@ -21,8 +21,8 @@ exports.testHandler = function(test){
 
     		test.done();
 		},
-		fail: function(error){
-			console.log(error)
+		fail: function(errorMessage){
+			console.log(errorMessage)
 		}
 	}
 	

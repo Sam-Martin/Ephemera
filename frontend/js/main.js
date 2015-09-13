@@ -59,6 +59,11 @@ $(document).ready(function () {
         
         $.get(apiUrl+'/getSecretUploadSignature',{'Content-Type':$('#file-select')[0].files[0].type, redirectTo:location.href}, function(result){
             
+            if(result.errorMessage){
+                alert(result.errorMessage)
+                return;
+            }
+
             $('#file-form [name=AWSAccessKeyId]').val(result.AWSAccessKeyId)
             $('#file-form [name=key]').val(result.key)
             $('#file-form [name=acl]').val(result.acl)

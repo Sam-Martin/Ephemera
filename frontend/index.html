@@ -36,7 +36,7 @@
             </form>
             <h1>Upload</h1>
             <form id="file-form" action="https://ephemera-upload.s3.amazonaws.com/" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="key" value="">
+              <input type="hidden" name="key" value="">
               <input type="hidden" name="AWSAccessKeyId" value=""> 
               <input type="hidden" name="acl" value=""> 
               <input type="hidden" name="success_action_redirect" value="">
@@ -44,7 +44,7 @@
               <input type="hidden" name="signature" value="">
               <input type="hidden" name="Content-Type" value="">
 
-                <input type="file" name="file" id="file-select"/>
+                <input type="file" name="file" id="file-select" accept="image/*"/>
                 <input type="Submit" Value="Submit"/>
             </form>
             <div id="secretOutput">
