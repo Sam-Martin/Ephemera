@@ -33,14 +33,14 @@ module.exports = {
     return ed;
   },
 
-  generateS3PolicyString: function( bucketName, bucketKey, contentType, expiryDate, s3ACL, successActionRedirect){
-     return '{\n    "expiration": "' + expiryDate + '",\n'
+  generateS3PolicyString: function( params){
+     return '{\n    "expiration": "' + params.expiryDate + '",\n'
           + '   "conditions": [\n'
-          + '       {"bucket": "' + bucketName + '"},'
-          + '       {"key": "' + bucketKey + '"},'
-          + '       {"acl": "' + s3ACL + '"},'
-          + '       {"success_action_redirect": "' +successActionRedirect + '"},'
-          + '       {"Content-Type": "' + contentType + '"}]\n}';
+          + '       {"bucket": "' + params.bucketName + '"},'
+          + '       {"key": "' + params.bucketKey + '"},'
+          + '       {"acl": "' + params.s3ACL + '"},'
+          + '       {"success_action_redirect": "' +params.successActionRedirect + '"},'
+          + '       {"Content-Type": "' + params.contentType + '"}]\n}';
   },
 
   base64PolicyString: function(policyString){
@@ -56,12 +56,23 @@ module.exports = {
   },
 
   GenerateOutput: function(params,returnFunction){
+
+    console.log("Generating S3 signing output")
     var context = params.context
-
-
     var bucketKey = module.exports.generateUUID();
-    var s3PolicyBase64 = module.exports.base64PolicyString(module.exports.generateS3PolicyString( params.bucketName, bucketKey, params.contentType,
-       module.exports.generateS3ExpiryDate(60*1000), params.s3ACL, params.successActionRedirect));
+    var objectURL = 'https://s3-'+params.bucketRegion+'.amazonaws.com/'+params.bucketName+'/'+bucketKey
+    var successActionRedirect = params.successActionRedirect // + '&objectURL=' + objectURL
+
+    console.log("Genering s3 policy")
+    var s3PolicyBase64 = module.exports.base64PolicyString(module.exports.generateS3PolicyString({
+      bucketName: params.bucketName,
+      bucketKey: bucketKey,
+      contentType: params.contentType,
+      expiryDate: module.exports.generateS3ExpiryDate(60*1000), 
+      s3ACL: params.s3ACL, 
+      successActionRedirect: successActionRedirect
+    }));
+
     console.log("generated policy")
     var s3Signature = module.exports.signS3Policy(s3PolicyBase64, params.secretAccessKey); 
 
@@ -70,7 +81,7 @@ module.exports = {
       "key":bucketKey, 
       "AWSAccessKeyId":params.accessKeyId,
       "acl": params.s3ACL,
-      "success_action_redirect": params.successActionRedirect,
+      "success_action_redirect": successActionRedirect,
       "policy": s3PolicyBase64,
       "signature": s3Signature,
       "Content-Type": params.contentType

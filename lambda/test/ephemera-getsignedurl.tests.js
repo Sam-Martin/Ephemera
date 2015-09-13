@@ -7,7 +7,7 @@ exports.testHandler = function(test){
 		done: function(ignore,json){
 			console.log(json)
 			
-			test.equal(json['success_action_redirect'], 'http://google.com', "Check redirect");
+			test.ok(/http:\/\/google.com\/\.*/.test(json['success_action_redirect']), "Check redirect");
 			
 			test.equal(json['Content-Type'], 'image/jpeg', "check content type");
 
@@ -27,7 +27,7 @@ exports.testHandler = function(test){
 	}
 	
 	// Kick off the function we're testing
-	ephemera.handler({"Content-Type":"image/jpeg"},context)
+	ephemera.handler({"Content-Type":"image/jpeg", "redirectTo":'http://google.com/'},context)
 
 
     

@@ -14,6 +14,95 @@
         "application/json"
     ],
     "paths": {
+        "/getSecret":{
+            "get":{
+                "summary": "Get a secret",
+                  "description": "Retrieve a secret, deleting it in the process",
+                  "parameters": [
+                    {
+                        "name": "key",
+                        "in": "query",
+                        "description": "Key of the secret to be retrieved",
+                        "required": true,
+                        "type": "string"
+                    }
+                  ],
+                  "responses": {
+                        "200": {
+                            "description": "Body of the secret",
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/S3ObjectContent"
+                                }
+                            },
+                            "headers": {
+                            "Access-Control-Allow-Headers":{
+                                "description": "Specifies the allowed headers",
+                                "type": "string",
+                                "default": "'Content-Type,X-Amz-Date,Authorization'"
+                            },
+                            "Access-Control-Allow-Methods":{
+                                "description": "Specifies the allowed methods",
+                                "type": "string",
+                                "default": "'GET,POST'"
+                            },
+                            "Access-Control-Allow-Origin":{
+                                "description": "Specifies the allowed origins",
+                                "type": "string",
+                                "default": "'*'"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                },
+                "x-amazon-apigateway-auth" : {
+                    "type" : "none"
+                },
+                "x-amazon-apigateway-integration" : {
+                    "type" : "aws",
+                    "uri" : "arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:080863329876:function:ephemera-getsecret/invocations",
+                    "httpMethod" : "POST",
+                    "credentials" : "arn:aws:iam::080863329876:role/APIGatewayLambdaExecRole",
+                    "requestTemplates":{
+                        "application/json": "{ \"key\": \"$input.params('key')\" }"
+                    },
+                    "cacheNamespace" : "cache-namespace",
+                    "cacheKeyParameters" : [],
+                    "responses" : {
+                        "2//d{2}" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                                "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,X-Amz-Date,Authorization'",
+                                "method.response.header.Access-Control-Allow-Methods" : "'GET,POST'",
+                                "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                            
+                        },
+                        "default" : {
+                            "statusCode" : "200",
+                            "responseParameters" : {
+                                "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,X-Amz-Date,Authorization'",
+                                "method.response.header.Access-Control-Allow-Methods" : "'GET,POST'",
+                                "method.response.header.Access-Control-Allow-Origin" : "'*'"
+                            }
+                            
+                        }
+                    }
+                }
+            }
+        },
         "/addTextSecret":{
             "post":{
                 "summary": "Add a text secret",
@@ -117,6 +206,13 @@
                         "description": "Mime-type of the file to be uploaded",
                         "required": true,
                         "type": "string"
+                    },
+                     {
+                        "name": "redirectTo",
+                        "in": "query",
+                        "description": "URL to redirect to, will have a hashmap of the objectURL appended",
+                        "required": true,
+                        "type": "string"
                     }
                 ],
                 "responses": {
@@ -168,10 +264,7 @@
                     "httpMethod" : "POST",
                     "credentials" : "arn:aws:iam::080863329876:role/APIGatewayLambdaExecRole",
                     "requestTemplates":{
-                        "application/json": "{ \"Content-Type\": \"$input.params('Content-Type')\" }"
-                    },
-                    "requestParameters" : {
-                        "integration.request.path.integrationPathParam" : "method.request.querystring.Content-Type"
+                        "application/json": "{ \"Content-Type\": \"$input.params('Content-Type')\", \"redirectTo\": \"$input.params('redirectTo')\" }"
                     },
                     "cacheNamespace" : "cache-namespace",
                     "cacheKeyParameters" : [],
@@ -218,6 +311,19 @@
                 "objectURL": {
                     "type": "string",
                     "description": "Name of the bucket"
+                }
+            }
+        },
+         "S3ObjectContent": {
+            "type": "object",
+            "properties": {
+                "Content-Type": {
+                    "type": "string",
+                    "description": "Type of content"
+                },
+                "body": {
+                    "type": "string",
+                    "description": "base64 encoded content of the secret"
                 }
             }
         },

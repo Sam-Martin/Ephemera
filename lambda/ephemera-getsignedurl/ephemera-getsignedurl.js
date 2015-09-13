@@ -29,9 +29,10 @@ exports.handler = function(event, context, params) {
         params = {
           accessKeyId: config.accessKeyId,
           bucketName: config.bucketName,
+          bucketRegion: config.bucketRegion,
           secretAccessKey: secretAccessKey,
           s3ACL: config.s3ACL,
-          successActionRedirect: config.successActionRedirect,
+          successActionRedirect: event['redirectTo'],
           contentType: event['Content-Type'],
           roleArn: roleArn,
           context:context
