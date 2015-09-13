@@ -56,33 +56,24 @@ module.exports = {
   },
 
   GenerateOutput: function(params,returnFunction){
-      var context = params.context
-     // Assume the role we're executing under again so that we can access the secret key
-    sts.assumeRole({RoleArn:params.roleArn,RoleSessionName:"test"},function(err,data){
-      if(err){
-        console.log(err);
-        context.fail("Error: " + JSON.stringify(err));
-      }
-      //var ContentType = event['Content-Type'];
-      console.log("loaded role " + params.roleArn + " successfully");
+    var context = params.context
 
-      //var accessKeyId = data.Credentials.AccessKeyId;
-      //var secretAccessKey = data.Credentials.SecretAccessKey;
 
-      var bucketKey = module.exports.generateUUID();
-      var s3PolicyBase64 = module.exports.base64PolicyString(module.exports.generateS3PolicyString( params.bucketName, bucketKey, params.contentType,
-         module.exports.generateS3ExpiryDate(60*1000), params.s3ACL, params.successActionRedirect));
-      var s3Signature = module.exports.signS3Policy(s3PolicyBase64, params.secretAccessKey);
+    var bucketKey = module.exports.generateUUID();
+    var s3PolicyBase64 = module.exports.base64PolicyString(module.exports.generateS3PolicyString( params.bucketName, bucketKey, params.contentType,
+       module.exports.generateS3ExpiryDate(60*1000), params.s3ACL, params.successActionRedirect));
+    console.log("generated policy")
+    var s3Signature = module.exports.signS3Policy(s3PolicyBase64, params.secretAccessKey); 
 
-      returnFunction({
-        "key":bucketKey, 
-        "AWSAccessKeyId":params.accessKeyId,
-        "acl": params.s3ACL,
-        "success_action_redirect": params.successActionRedirect,
-        "policy": s3PolicyBase64,
-        "signature": s3Signature,
-        "Content-Type": params.contentType
-      })
+    console.log("Generated s3 signed policy! calling return function")
+    returnFunction({
+      "key":bucketKey, 
+      "AWSAccessKeyId":params.accessKeyId,
+      "acl": params.s3ACL,
+      "success_action_redirect": params.successActionRedirect,
+      "policy": s3PolicyBase64,
+      "signature": s3Signature,
+      "Content-Type": params.contentType
     })
   }
 }

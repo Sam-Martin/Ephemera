@@ -24,11 +24,17 @@
         </nav>
         <div class="jumbotron">
             <div class="container text-center">
-                <h1>Secret Upload</h1>
+                <h1>Secret Transfer</h1>
                 <p>Select a file (less than 500k) you wish to upload to be provided with a 1-time use URL to access it.
             </div>
         </div>
         <div class="container">
+            <h1>Text Entry</h1>
+            <form id="text-form">
+                <input type="password" id="secret-text"/>
+                <input type="submit" value="Submit">
+            </form>
+            <h1>Upload</h1>
             <form id="file-form" action="https://image-upload-smartin.s3.amazonaws.com/" method="post" enctype="multipart/form-data">
             <input type="hidden" name="key" value="">
               <input type="hidden" name="AWSAccessKeyId" value=""> 
@@ -41,7 +47,10 @@
                 <input type="file" name="file" id="file-select"/>
                 <input type="Submit" Value="Submit"/>
             </form>
-
+            <div id="secretOutput">
+                <h1>Secret URL</h1>
+                <p id="secretURL">...</p>
+            </div>
         </div>
     </body>
 </head>

@@ -13,3 +13,7 @@
 .jumbotron{
 	margin-top: 2em;
 }
+
+#secretOutput{
+	display:none;
+}

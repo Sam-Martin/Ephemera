@@ -11,7 +11,7 @@ exports.testHandler = function(test){
 			
 			test.equal(json['Content-Type'], 'image/jpeg', "check content type");
 
-			test.equal(json['acl'], 'public-read', "check content type");
+			test.equal(json['acl'], 'public-read', "check acl");
 			
 			test.ok(/[a-z0-9\-]*/.test(json['key']), "check key");
 
@@ -26,14 +26,8 @@ exports.testHandler = function(test){
 		}
 	}
 	
-	// Define params to test against
-	testingParams = {
-		secretPath: './ephemera-getsignedurl/EncryptedBase64.secret',
-		roleArn: 'arn:aws:iam::080863329876:role/asda'
-	}
-	
-	// Kick off the functin we're testing
-	ephemera.handler({"Content-Type":"image/jpeg"},context,testingParams)
+	// Kick off the function we're testing
+	ephemera.handler({"Content-Type":"image/jpeg"},context)
 
 
     
