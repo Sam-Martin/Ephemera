@@ -6,23 +6,24 @@ This repository contains the Node.js, HTML, JavaScript, and supporting jQuery pl
 ## Overview
 This project is currently functional but needs work to tidy up unit tests etc.
 ## Setup
-Ensure you have the AWS PowerShell cmdlets [installed and configured](http://docs.aws.amazon.com/powershell/latest/userguide/pstools-getting-started.html).
+Ensure you have the AWS PowerShell cmdlets [installed and configured](http://docs.aws.amazon.com/powershell/latest/userguide/pstools-getting-started.html).  
+
 ##### 0) Create the S3 buckets
 1. Create a bucket to house the uploads (no special policy needs to be set).
-2. Create a bucket to house the website that interfaces with the API [(setting the policy to allow it to serve as a website)](http://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteHosting.html).
+2. Create a bucket to house the website that interfaces with the API [(setting the policy to allow it to serve as a website)](http://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteHosting.html).  
 
 ##### 1) Create the IAM roles/users/policies as per the below 
-1. See `Permissions` below, replacing the bucket names with the bucket you created (saving the API & secret key you create for the user)
+1. See `Permissions` below, replacing the bucket names with the bucket you created (saving the API & secret key you create for the user)  
 
 ##### 2) Create a KMS encryption key
 1. As per the [AWS Getting Started Guide](http://docs.aws.amazon.com/kms/latest/developerguide/create-keys.html)
-2. Give the `EphemeraLambda` role permission to read the key
+2. Give the `EphemeraLambda` role permission to read the key  
 
 ##### 3) Clone the repository & update the config
 1. `git clone https://github.com/Sam-Martin/Ephemera.git`
 2. Generate an encrypted version of the Secret Key you created earlier using the output from
 `aws kms encrypt --key-id my-key-id --plaintext "SecretKey" --query CiphertextBlob --output text` or [this PowerShell](https://gist.github.com/Sam-Martin/1955ac4ef3972bb9e8a8).
-3. Edit `Ephemera\lambda\common\ephemera-config.js` to reflect the `bucketName`, `bucketRegion`, `accessKey`, and `encryptedSecret` you created earlier.
+3. Edit `Ephemera\lambda\common\ephemera-config.js` to reflect the `bucketName`, `bucketRegion`, `accessKey`, and `encryptedSecret` you created earlier.  
 
 ##### 4) Create the Lambda functions
 1. `cd .\Ephemera`
@@ -44,7 +45,7 @@ zipfiles -zipfilename $repoDir\ephemera.zip -sourcedir D:\Dropbox\Dropbox\code\s
 @('ephemera-getsignedurl','ephemera-addtextsecret', 'ephemera-getsecret') |% {Remove-LMFunction -FunctionName $_ -Force}
 Publish-LMFunction -FunctionName ephemera-getsignedurl -FunctionZip $repoDir\ephemera.zip -role $LambdaARN -Runtime "nodejs" -Handler "lambda/ephemera-getsignedurl/ephemera-getsignedurl.handler"
 Publish-LMFunction -FunctionName ephemera-addtextsecret -FunctionZip $repoDir\ephemera.zip -role $LambdaARN -Runtime "nodejs" -Handler "lambda/ephemera-addtextsecret/ephemera-addtextsecret.handler"
-Publish-LMFunction -FunctionName ephemera-getsecret -FunctionZip $repoDir\ephemera.zip -role $lambdaARN -Runtime "nodejs" -Handler "lambda/ephemera-getsecret/ephemera-getsecret.handler"
+Publish-LMFunction -FunctionName ephemera-getsecret -FunctionZip $repoDir\ephemera.zip -role $lambdaARN -Runtime "nodejs" -Handler "lambda/ephemera-getsecret/ephemera-getsecret.handler"  
 ````
 
 ##### 5) Create the API  using AWS API Swagger Importer
@@ -59,10 +60,10 @@ Publish-LMFunction -FunctionName ephemera-getsecret -FunctionZip $repoDir\epheme
 ##### 6) Setup the website
 1. Edit `Epherema/frontend/index.html` and replace `action="https://ephemera-upload.s3.amazonaws.com/"` with your s3 bucket for private uploads
 2. Edit `Ephemera/frontend/js/main.js` and replace `var apiUrl = 'https://licotqtmvg.execute-api.eu-west-1.amazonaws.com/staging/v1';` with the api URL of the API Gateway Staging created by the Swagger Importer. *(Hint: you can find this in the AWS Console by browsing to "Stages" under the API Gateway section of the AWS console in the region you set as default.)*
-3. Upload the contents of `Ephemera\frontend` to the S3 bucket you setup to work as a website
+3. Upload the contents of `Ephemera\frontend` to the S3 bucket you setup to work as a website  
 
 ##### 7) Done!
-1. Browse your website bucket's URL and try uploading a secret!
+1. Browse your website bucket's URL and try uploading a secret!  
 
 
 ## Permissions
