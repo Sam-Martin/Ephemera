@@ -10,6 +10,11 @@
 .navbar-header > h3{
 	color: white;
 }
+.navbar-right  img{
+	margin-top: 0.5em;
+	height:3em;
+	vertical-align: middle;
+}
 .jumbotron{
 	margin-top: 2em;
 }
