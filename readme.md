@@ -3,7 +3,10 @@
 This repository contains the Node.js, HTML, JavaScript, and supporting jQuery plugins to upload secrets securely to S3 and deliver a one-time URL back to the user.
 ## Demo
 [Ephemera Demo](http://ephemera.sammart.in/)
-## Overview
+## Overview  
+Ephemera is a one-time secret transfer tool intended to help you in the transition from legacy tools which do not allow secure secret communication (e.g. via password reset URLs or key fingerprints).  
+Ephemera is intended to be simple enough to be audited by someone with a basic understanding of JavaScript and AWS to validate that it is a non-malicous method for password transfer that you can setup in your own AWS account.  
+It is not intended to be a replacement for proper user-centric secret management, but merely a transitional phase to help eradicate secrets attached to plaintext emails.  
 This project is currently functional but needs work to tidy up unit tests etc.
 ## Setup
 Ensure you have the AWS PowerShell cmdlets [installed and configured](http://docs.aws.amazon.com/powershell/latest/userguide/pstools-getting-started.html).  
