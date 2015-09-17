@@ -1,3 +1,4 @@
 *.zip
 *.secret
 *node_modules
+variables.tf
