@@ -8,7 +8,7 @@
         <!-- Bootstrap CSS -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
         <!-- CSS specific to this page -->
-        <link rel="stylesheet" href="css/amazon-image-upload-test.css">
+        <link rel="stylesheet" href="css/ephemera.css">
 
 
         <!-- Latest compiled and minified JavaScript -->
@@ -19,39 +19,48 @@
     <body>
         <nav class="navbar navbar-inverse navbar-fixed-top">
             <div class="container">
-                <div class="navbar-header"><h3>Ephemera - One Time Password Transfer</h3></div>
-                <div class="nav navbar-nav navbar-right"><a href="https://github.com/Sam-Martin/Ephemera/"><img src="img/GitHub-Mark-Light-120px-plus.png"/></a></div>
+                <div class="navbar-header"><h3><img src="img/ephemera-log-no-background.png" class="logo_small"/> Ephemera - One Time Password Transfer</h3></div>
+                <div class="nav navbar-nav navbar-right"><h3><a href="https://github.com/Sam-Martin/Ephemera/"><img src="img/GitHub-Mark-Light-120px-plus.png"/></a></h3></div>
             </div>
         </nav>
         <div class="jumbotron" id="pageSubtitle">
             <div class="container text-center">
-                <h1>Secret Transfer</h1>
-                <p>Select a file (less than 500k) you wish to upload to be provided with a 1-time use URL to access it.
+            	
+            	<h1>Ephemera</h1>
+                <h2>Secret Transfer</h2>
+                <p>Select a file (less than 500k) you wish to upload to be provided with a one-time use URL to access it.
             </div>
         </div>
         <div class="container" id="pageBody">
-            <h1>Text Entry</h1>
-            <form id="text-form">
-                <input type="password" id="secret-text"/>
-                <input type="submit" value="Submit">
-            </form>
-            <h1>Upload</h1>
-            <form id="file-form" action="https://ephemera-upload.s3.amazonaws.com/" method="post" enctype="multipart/form-data">
-              <input type="hidden" name="key" value="">
-              <input type="hidden" name="AWSAccessKeyId" value=""> 
-              <input type="hidden" name="acl" value=""> 
-              <input type="hidden" name="success_action_redirect" value="">
-              <input type="hidden" name="policy" value="">
-              <input type="hidden" name="signature" value="">
-              <input type="hidden" name="Content-Type" value="">
+        	<div class="row">
+	        	<div class="col-md-6">
+		            <h1>Text Entry</h1>
+		            <form id="text-form">
+		                <input type="password" id="secret-text"/>
+		                <input type="submit" value="Submit">
+		            </form>
+				</div>
+				<div class="col-md-6">
+		            <h1>Upload File</h1>
+		            <form id="file-form" action="https://ephemera-upload.s3.amazonaws.com/" method="post" enctype="multipart/form-data">
+		              <input type="hidden" name="key" value="">
+		              <input type="hidden" name="AWSAccessKeyId" value=""> 
+		              <input type="hidden" name="acl" value=""> 
+		              <input type="hidden" name="success_action_redirect" value="">
+		              <input type="hidden" name="policy" value="">
+		              <input type="hidden" name="signature" value="">
+		              <input type="hidden" name="Content-Type" value="">
 
-                <input type="file" name="file" id="file-select" accept="image/*"/>
-                <input type="Submit" Value="Submit"/>
-            </form>
+						<input type="file" name="file" id="file-select" accept="image/*"/>
+						<input type="Submit" Value="Submit"/>
+		            </form>
+		        </div>
+		    </div>
             <div id="secretOutput">
                 <h1>Secret URL</h1>
                 <p id="secretURL">...</p>
             </div>
+
         </div>
     </body>
 </head>
