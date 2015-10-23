@@ -105,7 +105,7 @@ resource "aws_iam_role" "ephemera_lambda_executor_role" {
     {
       "Action": "sts:AssumeRole",
       "Principal": {
-        "Service": "lambda.amazonaws.com"
+        "Service": "apigateway.amazonaws.com"
       },
       "Effect": "Allow",
       "Sid": ""
