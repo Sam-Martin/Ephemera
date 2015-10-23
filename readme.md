@@ -15,13 +15,13 @@ Ensure you have the AWS PowerShell cmdlets [installed and configured](http://doc
 Install Terraform from https://terraform.io/intro/getting-started/install.html
 
 ##### 2) Create a KMS encryption key
-As per the [AWS Getting Started Guide](http://docs.aws.amazon.com/kms/latest/developerguide/create-keys.html)
+As per the [AWS Getting Started Guide](http://docs.aws.amazon.com/kms/latest/developerguide/create-keys.html).  
+This is used to encrypt the API key we'll be using to sign the S3 upload URLs
 
-##### 2) Clone the repository & create the stack
+##### 2) Clone the Repository & Create the Stack
 1. `git clone https://github.com/Sam-Martin/Ephemera.git`
-2. Create a zip of the `Ephemera\Lambda` folder called `ephemera.zip`
-3. CD into the `terraform directory` and execute Terraform with `terraform apply -var 'public_bucket_name=your-public-bucket-name' -var 'private_bucket_name=your-private-bucket-name' -var 'access_key=AAAAAAAAAAAAAAAAAAAAA' -var 'secret_key=AAAAAAAAAAAAAAAAAAAAA'`
-4. Give the `EphemeraLambda` role permission to read the key
+2. Create a zip of the `Ephemera\Lambda` folder called `ephemera.zip` (the zip should contain the folder `Lambda` and all its contents)
+3. CD into the `terraform` directory and execute Terraform with `terraform apply -var 'public_bucket_name=your-public-bucket-name' -var 'private_bucket_name=your-private-bucket-name' -var 'access_key=AAAAAAAAAAAAAAAAAAAAA' -var 'secret_key=AAAAAAAAAAAAAAAAAAAAA'`
 5. Generate an encrypted version of the secret key terraform created for the user EphemeraS3Signer (found in `Ephemera\terraform\terraform.tfstate`)
 `aws kms encrypt --key-id my-key-id --plaintext "SecretKey" --query CiphertextBlob --output text` or [this PowerShell](https://gist.github.com/Sam-Martin/1955ac4ef3972bb9e8a8).
 6.Edit `Ephemera\lambda\common\ephemera-config.js` to reflect the `bucketName`, `bucketRegion`, `accessKey`, and `encryptedSecret` you created earlier.  
@@ -33,21 +33,24 @@ As per the [AWS Getting Started Guide](http://docs.aws.amazon.com/kms/latest/dev
 9. Re-run Terraform with the cmd you ran in 2.3
 10. Grant `EphemeraS3Signer` access to read the KMS key you created earlier
 
-##### 5) Create the API  using AWS API Swagger Importer
+##### 5) Create the API using AWS API Swagger Importer
 1. [Install Maven](https://maven.apache.org/)
 2. Ensure you have your AWS default credentials set (`$home\.aws\config`)
 2. `cd ..`  
 3. `git clone https://github.com/awslabs/aws-apigateway-swagger-importer.git`  
 4. `cd .\aws-apigateway-swagger-importer\`  
 5. `mvn assembly:assembly`  
-6. Edit `Ephemera\api-gateway\ephemera-swagger-spec.json` and replace the default AWS account ID `080863329876` with your own AWS account ID.
+6. Edit `Ephemera\api-gateway\ephemera-swagger-spec.json` and replace  
+    1. The default AWS account ID `080863329876` with your own AWS account ID.
+    2. The `Access-Control-Allow-Origin`  of `http://ephemera.sammart.in` with the url of your implementation
 6. `.\aws-api-import.cmd -c ..\Ephemera\api-gateway\ephemera-swagger-spec.json`
 7. `.\aws-api-import.cmd -c ..\Ephemera\api-gateway\ephemera-swagger-spec.json -d prod -u <api-id output from previous cmd>` 
 
 
 ##### 6) Setup the website
 1. Edit `Epherema/frontend/index.html` and replace `action="https://ephemera-upload.s3.amazonaws.com/"` with the name of your s3 bucket for private uploads
-2. Edit `Ephemera/frontend/js/main.js` and replace `var apiUrl = 'https://licotqtmvg.execute-api.eu-west-1.amazonaws.com/staging/v1';` with the api URL of the API Gateway Staging created by the Swagger Importer. *(Hint: you can find this in the AWS Console by browsing to "Stages" under the API Gateway section of the AWS console in the region you set as default.)*
+2. Edit `Ephemera/frontend/js/main.js` and replace `var apiUrl = 'https://licotqtmvg.execute-api.eu-west-1.amazonaws.com/staging/v1';` with the api URL of the API Gateway Staging created by the Swagger Importer.  
+(**Hint:** you can find this in the AWS Console by browsing to "Stages" under the API Gateway section of the AWS console in the region you set as default.)*
 3. Upload the contents of `Ephemera\frontend` to the S3 bucket you setup to work as a website  
 
 ##### 7) Done!

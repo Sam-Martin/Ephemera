@@ -88,7 +88,7 @@
                      "responseParameters":{
                         "method.response.header.Access-Control-Allow-Headers":"'Content-Type,X-Amz-Date,Authorization'",
                         "method.response.header.Access-Control-Allow-Methods":"'GET,POST'",
-                        "method.response.header.Access-Control-Allow-Origin":"'*'"
+                        "method.response.header.Access-Control-Allow-Origin":"'http://ephemera.sammart.in'"
                      }
                   },
                   "default":{
@@ -96,7 +96,7 @@
                      "responseParameters":{
                         "method.response.header.Access-Control-Allow-Headers":"'Content-Type,X-Amz-Date,Authorization'",
                         "method.response.header.Access-Control-Allow-Methods":"'GET,POST'",
-                        "method.response.header.Access-Control-Allow-Origin":"'*'"
+                        "method.response.header.Access-Control-Allow-Origin":"'http://ephemera.sammart.in'"
                      }
                   }
                }
@@ -179,7 +179,7 @@
                      "responseParameters":{
                         "method.response.header.Access-Control-Allow-Headers":"'Content-Type,X-Amz-Date,Authorization'",
                         "method.response.header.Access-Control-Allow-Methods":"'GET,POST'",
-                        "method.response.header.Access-Control-Allow-Origin":"'*'"
+                        "method.response.header.Access-Control-Allow-Origin":"'http://ephemera.sammart.in'"
                      }
                   },
                   "default":{
@@ -187,7 +187,7 @@
                      "responseParameters":{
                         "method.response.header.Access-Control-Allow-Headers":"'Content-Type,X-Amz-Date,Authorization'",
                         "method.response.header.Access-Control-Allow-Methods":"'GET,POST'",
-                        "method.response.header.Access-Control-Allow-Origin":"'*'"
+                        "method.response.header.Access-Control-Allow-Origin":"'http://ephemera.sammart.in'"
                      }
                   }
                }
@@ -275,7 +275,7 @@
                      "responseParameters":{
                         "method.response.header.Access-Control-Allow-Headers":"'Content-Type,X-Amz-Date,Authorization'",
                         "method.response.header.Access-Control-Allow-Methods":"'GET,POST'",
-                        "method.response.header.Access-Control-Allow-Origin":"'*'"
+                        "method.response.header.Access-Control-Allow-Origin":"'http://ephemera.sammart.in'"
                      }
                   },
                   "default":{
@@ -283,7 +283,7 @@
                      "responseParameters":{
                         "method.response.header.Access-Control-Allow-Headers":"'Content-Type,X-Amz-Date,Authorization'",
                         "method.response.header.Access-Control-Allow-Methods":"'GET,POST'",
-                        "method.response.header.Access-Control-Allow-Origin":"'*'"
+                        "method.response.header.Access-Control-Allow-Origin":"'http://ephemera.sammart.in'"
                      }
                   }
                }
