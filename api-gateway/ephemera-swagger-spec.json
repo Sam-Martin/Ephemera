@@ -74,7 +74,7 @@
                "type":"aws",
                "uri":"arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:080863329876:function:ephemera-getsecret/invocations",
                "httpMethod":"POST",
-               "credentials":"arn:aws:iam::080863329876:role/APIGatewayLambdaExecRole",
+               "credentials":"arn:aws:iam::080863329876:role/EphemeraLambdaExecutor",
                "requestTemplates":{
                   "application/json":"{ \"key\": \"$input.params('key')\" }"
                },
@@ -165,7 +165,7 @@
                "type":"aws",
                "uri":"arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:080863329876:function:ephemera-addtextsecret/invocations",
                "httpMethod":"POST",
-               "credentials":"arn:aws:iam::080863329876:role/APIGatewayLambdaExecRole",
+               "credentials":"arn:aws:iam::080863329876:role/EphemeraLambdaExecutor",
                "requestTemplates":{
                   "application/json":"{ \"secretText\": \"$input.params('secretText')\" }"
                },
@@ -261,7 +261,7 @@
                "type":"aws",
                "uri":"arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:080863329876:function:ephemera-getsignedurl/invocations",
                "httpMethod":"POST",
-               "credentials":"arn:aws:iam::080863329876:role/APIGatewayLambdaExecRole",
+               "credentials":"arn:aws:iam::080863329876:role/EphemeraLambdaExecutor",
                "requestTemplates":{
                   "application/json":"{ \"Content-Type\": \"$input.params('Content-Type')\", \"redirectTo\": \"$input.params('redirectTo')\" }"
                },
