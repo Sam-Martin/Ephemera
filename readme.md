@@ -23,8 +23,8 @@ This is used to encrypt the API key we'll be using to sign the S3 upload URLs
 2. Create a zip of the `Ephemera\Lambda` folder called `ephemera.zip` (the zip should contain the folder `Lambda` and all its contents)
 3. CD into the `terraform` directory and execute Terraform with `terraform apply -var 'public_bucket_name=your-public-bucket-name' -var 'private_bucket_name=your-private-bucket-name' -var 'access_key=AAAAAAAAAAAAAAAAAAAAA' -var 'secret_key=AAAAAAAAAAAAAAAAAAAAA'`
 5. Generate an encrypted version of the secret key terraform created for the user EphemeraS3Signer (found in `Ephemera\terraform\terraform.tfstate`)
-`aws kms encrypt --key-id my-key-id --plaintext "SecretKey" --query CiphertextBlob --output text` or [this PowerShell](https://gist.github.com/Sam-Martin/1955ac4ef3972bb9e8a8).
-6.Edit `Ephemera\lambda\common\ephemera-config.js` to reflect the `bucketName`, `bucketRegion`, `accessKey`, and `encryptedSecret` you created earlier.  
+`aws kms encrypt --key-id my-key-id --plaintext "SecretKey" --query CiphertextBlob --output text` or [this PowerShell](https://gist.github.com/Sam-Martin/1955ac4ef3972bb9e8a8).  
+6. Edit `Ephemera\lambda\common\ephemera-config.js` to reflect the `bucketName`, `bucketRegion`, `accessKey`, and `encryptedSecret` you created earlier.  
 7. Recreate the zip of the `Ephemera\Lambda` folder called `ephemera.zip`
 8. Taint the lambda resources for recreation using   
         `terraform taint aws_lambda_function.ephemera-getsignedurl`  
