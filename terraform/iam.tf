@@ -3,7 +3,7 @@ resource "aws_iam_access_key" "lb" {
 }
 
 resource "aws_iam_user" "ephemera_s3_url_signer" {
-    name = "${var.ephemera_s3_url_signer.name}"
+    name = "${var.ephemera_s3_url_signer}"
     path = "/system/"
 }
 
@@ -30,9 +30,6 @@ resource "aws_iam_user_policy" "ephemera_s3_url_signer_policy" {
 EOF
 }
 
-
-
-
 resource "aws_iam_role" "ephemera_lambda_role" {
     name = "${var.lambda_role_name}"
     assume_role_policy = <<EOF
@@ -42,7 +39,7 @@ resource "aws_iam_role" "ephemera_lambda_role" {
     {
       "Action": "sts:AssumeRole",
       "Principal": {
-        "Service": "ec2.amazonaws.com"
+        "Service": "lambda.amazonaws.com"
       },
       "Effect": "Allow",
       "Sid": ""
@@ -108,7 +105,7 @@ resource "aws_iam_role" "ephemera_lambda_executor_role" {
     {
       "Action": "sts:AssumeRole",
       "Principal": {
-        "Service": "ec2.amazonaws.com"
+        "Service": "lambda.amazonaws.com"
       },
       "Effect": "Allow",
       "Sid": ""
