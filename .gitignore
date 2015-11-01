@@ -1,3 +1,5 @@
 *.zip
 *.secret
 *node_modules
+terraform.tfvars
+terraform.tfstate*

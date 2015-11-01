@@ -7,13 +7,14 @@
 	max-height:20em;
 
 }
-.navbar-header > h3{
-	color: white;
+.navbar img{
+	height:2em;
+	display:inline;
 }
-.navbar-right  img{
-	margin-top: 0.5em;
-	height:3em;
-	vertical-align: middle;
+
+.navbar-header h3{
+	color: white;
+	display:inline-block;
 }
 .jumbotron{
 	margin-top: 2em;
@@ -21,4 +22,8 @@
 
 #secretOutput{
 	display:none;
+}
+
+input[type=file] {
+	float:left
 }
