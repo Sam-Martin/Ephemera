@@ -13,11 +13,10 @@ Ephemera is intended to be simple enough to be audited by someone with a basic u
 It is not intended to be a replacement for proper user-centric secret management, but merely a transitional phase to help eradicate secrets attached to plaintext emails.  
 This project is currently functional but needs work to tidy up unit tests etc.
 ## How it Works
-Ephemera uses three components  
-
-1) AWS S3 for website hosting and secret storage (separate buckets)  
-2) AWS Lambda for GUID creation and one-time S3 upload URL signing  
-3) AWS API Gateway as a front-end for Lambda allowing the JavaScript from the S3 website to retrieve GUIDs and one-time upload URLs  
+Ephemera uses three components
+1. AWS S3 for website hosting and secret storage (separate buckets)
+2. AWS Lambda for GUID creation and one-time S3 upload URL signing
+3. AWS API Gateway as a front-end for Lambda allowing the JavaScript from the S3 website to retrieve GUIDs and one-time upload URLs
 
 The user is presented with a website that gives them the option to upload a text or an image secret . 
 ### Uploading a Text Secret
