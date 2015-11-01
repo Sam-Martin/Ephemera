@@ -15,8 +15,6 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
         <!-- The main JS for bringing it all together on this page -->
         <script src="js/main.js"></script>
-        <!-- The config js that contains replacable values -->
-        <script src="js/frontend_config.js"></script>
     </head>
     <body>
         <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -44,7 +42,7 @@
 				</div>
 				<div class="col-md-6">
 		            <h1>Upload File</h1>
-		            <form id="file-form" method="post" enctype="multipart/form-data">
+		            <form id="file-form" action="https://ephemera-upload.s3.amazonaws.com/" method="post" enctype="multipart/form-data">
 		              <input type="hidden" name="key" value="">
 		              <input type="hidden" name="AWSAccessKeyId" value=""> 
 		              <input type="hidden" name="acl" value=""> 
