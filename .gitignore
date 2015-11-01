@@ -3,3 +3,4 @@
 *node_modules
 terraform.tfvars
 terraform.tfstate*
+output/*

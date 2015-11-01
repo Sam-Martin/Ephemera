@@ -1,7 +1,7 @@
 {
    "swagger":"2.0",
    "info":{
-      "title":"Ephemera API",
+      "title":"${api_gateway_name}",
       "description":"Submit single-access secrets to the Ephemera API",
       "version":"1.0.0"
    },
@@ -73,7 +73,7 @@
                "type":"aws",
                "uri":"arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${aws_region}:${aws_account_id}:function:${ephemera_getsecret_function_name}/invocations",
                "httpMethod":"POST",
-               "credentials":${lambda_executor_role}",
+               "credentials":"${lambda_executor_role}",
                "requestTemplates":{
                   "application/json":"{ \"key\": \"$input.params('key')\" }"
                },
