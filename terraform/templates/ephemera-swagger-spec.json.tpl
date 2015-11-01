@@ -5,7 +5,6 @@
       "description":"Submit single-access secrets to the Ephemera API",
       "version":"1.0.0"
    },
-   "host":"ephemera.toukakoukan.com",
    "schemes":[
       "https"
    ],
@@ -72,9 +71,9 @@
             },
             "x-amazon-apigateway-integration":{
                "type":"aws",
-               "uri":"arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:080863329876:function:ephemera-getsecret/invocations",
+               "uri":"arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${aws_region}:${aws_account_id}:function:${ephemera_getsecret_function_name}/invocations",
                "httpMethod":"POST",
-               "credentials":"arn:aws:iam::080863329876:role/EphemeraLambdaExecutor",
+               "credentials":${lambda_executor_role}",
                "requestTemplates":{
                   "application/json":"{ \"key\": \"$input.params('key')\" }"
                },
@@ -88,7 +87,7 @@
                      "responseParameters":{
                         "method.response.header.Access-Control-Allow-Headers":"'Content-Type,X-Amz-Date,Authorization'",
                         "method.response.header.Access-Control-Allow-Methods":"'GET,POST'",
-                        "method.response.header.Access-Control-Allow-Origin":"'http://ephemera.sammart.in'"
+                        "method.response.header.Access-Control-Allow-Origin":"'${public_bucket_url}'"
                      }
                   },
                   "default":{
@@ -96,7 +95,7 @@
                      "responseParameters":{
                         "method.response.header.Access-Control-Allow-Headers":"'Content-Type,X-Amz-Date,Authorization'",
                         "method.response.header.Access-Control-Allow-Methods":"'GET,POST'",
-                        "method.response.header.Access-Control-Allow-Origin":"'http://ephemera.sammart.in'"
+                        "method.response.header.Access-Control-Allow-Origin":"'${public_bucket_url}'"
                      }
                   }
                }
@@ -163,9 +162,9 @@
             },
             "x-amazon-apigateway-integration":{
                "type":"aws",
-               "uri":"arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:080863329876:function:ephemera-addtextsecret/invocations",
+               "uri":"arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${aws_region}:${aws_account_id}:function:${ephemera_addtextsecret_function_name}/invocations",
                "httpMethod":"POST",
-               "credentials":"arn:aws:iam::080863329876:role/EphemeraLambdaExecutor",
+               "credentials":"${lambda_executor_role}",
                "requestTemplates":{
                   "application/json":"{ \"secretText\": \"$input.params('secretText')\" }"
                },
@@ -179,7 +178,7 @@
                      "responseParameters":{
                         "method.response.header.Access-Control-Allow-Headers":"'Content-Type,X-Amz-Date,Authorization'",
                         "method.response.header.Access-Control-Allow-Methods":"'GET,POST'",
-                        "method.response.header.Access-Control-Allow-Origin":"'http://ephemera.sammart.in'"
+                        "method.response.header.Access-Control-Allow-Origin":"'${public_bucket_url}'"
                      }
                   },
                   "default":{
@@ -187,7 +186,7 @@
                      "responseParameters":{
                         "method.response.header.Access-Control-Allow-Headers":"'Content-Type,X-Amz-Date,Authorization'",
                         "method.response.header.Access-Control-Allow-Methods":"'GET,POST'",
-                        "method.response.header.Access-Control-Allow-Origin":"'http://ephemera.sammart.in'"
+                        "method.response.header.Access-Control-Allow-Origin":"'${public_bucket_url}'"
                      }
                   }
                }
@@ -259,9 +258,9 @@
             },
             "x-amazon-apigateway-integration":{
                "type":"aws",
-               "uri":"arn:aws:apigateway:eu-west-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-west-1:080863329876:function:ephemera-getsignedurl/invocations",
+               "uri":"arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${aws_region}:${aws_account_id}:function:${ephemera_getsignedurl_function_name}/invocations",
                "httpMethod":"POST",
-               "credentials":"arn:aws:iam::080863329876:role/EphemeraLambdaExecutor",
+               "credentials":"${lambda_executor_role}",
                "requestTemplates":{
                   "application/json":"{ \"Content-Type\": \"$input.params('Content-Type')\", \"redirectTo\": \"$input.params('redirectTo')\" }"
                },
@@ -275,7 +274,7 @@
                      "responseParameters":{
                         "method.response.header.Access-Control-Allow-Headers":"'Content-Type,X-Amz-Date,Authorization'",
                         "method.response.header.Access-Control-Allow-Methods":"'GET,POST'",
-                        "method.response.header.Access-Control-Allow-Origin":"'http://ephemera.sammart.in'"
+                        "method.response.header.Access-Control-Allow-Origin":"'${public_bucket_url}'"
                      }
                   },
                   "default":{
@@ -283,7 +282,7 @@
                      "responseParameters":{
                         "method.response.header.Access-Control-Allow-Headers":"'Content-Type,X-Amz-Date,Authorization'",
                         "method.response.header.Access-Control-Allow-Methods":"'GET,POST'",
-                        "method.response.header.Access-Control-Allow-Origin":"'http://ephemera.sammart.in'"
+                        "method.response.header.Access-Control-Allow-Origin":"'${public_bucket_url}'"
                      }
                   }
                }

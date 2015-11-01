@@ -14,17 +14,29 @@ function getUrlVars() {
 }
 var populateSecretURL = function (secretURL) {
   $('#secretURL').text(secretURL);
+  
   // Clear out the secret field
   $('#secret-text').val('');
+  
   // Slide down the output
   $('#secretOutput').slideDown();
 };
 $(document).ready(function () {
   urlVars = getUrlVars();
   if (typeof urlVars != 'undefined' && urlVars.bucket) {
+    
     // if bucket is defined as a GET variable we've just uploaded something
     populateSecretURL(window.location.origin + '?key=' + urlVars.key);
+  } else if(typeof urlVars != 'undefined' && window.location.href.match(/getSecret.html/)){
+
+    // if we don't have a secret key, but we're on getSecret.html, tell the user they can't do anything useful here
+    $('#secretOutput').html('<div class="alert alert-danger" role="alert"><strong>Error:</strong> No secret key defined. If you\'re trying to upload a secret, you may not have access to do so.</html>');
+  
+    // Slide down the output
+    $('#secretOutput').slideDown();
+
   } else if (typeof urlVars != 'undefined' && urlVars.key) {
+    
     // if key is defined without bucket then we're retrieving a secret
     var secretArea = $('#pageBody');
     $('#pageSubtitle p').text('Displaying a secret once...');
@@ -40,6 +52,7 @@ $(document).ready(function () {
       }
     });
   }
+  
   // Upload a file
   $('#file-form').submit(function (ev) {
     if (valuesSet) {
@@ -66,6 +79,7 @@ $(document).ready(function () {
       valuesSet = false;
     });
   });
+  
   // Upload a string
   $('#text-form').submit(function (ev) {
     ev.preventDefault();
