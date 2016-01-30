@@ -1,2 +1,2 @@
 var reporter = require('nodeunit').reporters.default;
-reporter.run(['test']);
+reporter.run(['lambda/test']);

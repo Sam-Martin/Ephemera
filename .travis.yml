@@ -7,3 +7,4 @@ script:
  - jshint lambda/*.js
  - jshint frontend/js/*.js
  - prettycss frontend/css/*.css
+ - nodeunit run-lambda-tests.js
