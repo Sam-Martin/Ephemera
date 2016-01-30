@@ -4,3 +4,4 @@
 terraform.tfvars
 terraform.tfstate*
 output/*
+ephemera/node_modules

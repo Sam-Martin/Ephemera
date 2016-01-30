@@ -13,7 +13,7 @@ variable "api_url" {default = "https://placeholder"}
 variable "ephemera_s3_url_signer" {default = "EphemeraS3Signer"}
 variable "lambda_role_name" {default = "EphemeraLambda"}
 variable "lambda_executor_role_name" {default = "EphemeraLambdaExecutor"}
-variable "ephemera_lambda_zip" {default = "..\ephemera.zip"}
+variable "ephemera_lambda_zip" {default = "..\\ephemera.zip"}
 
 variable "upload_secret_ip_whitelist" {default = <<EOF
 "aws:SourceIp": "0.0.0.0/0"

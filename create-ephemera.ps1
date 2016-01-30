@@ -55,6 +55,7 @@ function ZipFiles
 # Get the params we need
 $swaggerImporterPath = Read-Host "Path to aws swagger importer"
 $kmsKeyID = Read-Host "KMS Key ID"
+$kmsRegion = Read-Host "KMS Region"
 $global:terraformVars = @()
 
 # Unset logging level so we can capture our outputs
@@ -71,7 +72,7 @@ if($LASTEXITCODE -ne 0){throw "Error executing terraform"}
 
 # Encrypt the S3 user's API Secret Key for use in signing URLs
 $APISecretKey = terraform output s3_signer_secret_key
-$encryptedOutput = (ConvertFrom-StreamToBase64 -inputStream $(Invoke-KMSEncrypt -KeyId $kmsKeyID -Plaintext $(ConvertFrom-StringToMemoryStream $APISecretKey) -region us-east-1).CiphertextBlob)
+$encryptedOutput = (ConvertFrom-StreamToBase64 -inputStream $(Invoke-KMSEncrypt -KeyId $kmsKeyID -Plaintext $(ConvertFrom-StringToMemoryStream $APISecretKey) -region $kmsRegion).CiphertextBlob)
 $global:terraformVars += "-var 'encrypted_s3_url_signer_secret=$encryptedOutput'"
 
 # Populate the lambda config
@@ -135,4 +136,10 @@ $global:terraformVars += "-var 'frontend_config_location=output\frontend_config.
 Invoke-Expression -Command "terraform apply $($global:terraformVars -join ' ')"  -ErrorAction Stop
 if($LASTEXITCODE -ne 0){throw "Error executing terraform"}
 
+Pop-Location
+
+# Grant KMS Decrypt to Lambda Role
+Push-Location $PSScriptRoot\terraform
+$lambdaRoleARN = terraform output lambda_role_arn
+New-KMSGrant -KeyId $kmsKeyID -GranteePrincipal $lambdaRoleARN -Operation @("Decrypt") -region $kmsRegion -Name "ephemera-terraform"
 Pop-Location

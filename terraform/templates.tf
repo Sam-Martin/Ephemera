@@ -20,7 +20,7 @@ resource "template_file" "lambda-config" {
     vars {
     	ephemera_s3_url_signer_access_key = "${aws_iam_access_key.ephemera_s3_url_signer_key.id}"
     	aws_region = "${var.region}"
-    	public_bucket_name = "${var.public_bucket_name}"
+    	private_bucket_name = "${var.private_bucket_name}"
     	public_bucket_url = "${var.public_bucket_url}"
     	encrypted_s3_url_signer_secret = "${var.encrypted_s3_url_signer_secret}"
     }
@@ -50,4 +50,7 @@ output "api_gateway_id" {
 
 output "aws_region" {
     value = "${var.region}"
+}
+output "lambda_role_arn" {
+    value = "${aws_iam_role.ephemera_lambda_role.arn}"
 }
