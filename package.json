@@ -11,7 +11,7 @@
   "devDependencies":{
   	"nodeunit": "^0.9.1",
   	"aws-sdk": "^2.2.33",
-    "prettycss": "^0.3.10",
+    "PrettyCSS": "^0.3.10",
     "jshint": "^2.8.0"
   }
 }
