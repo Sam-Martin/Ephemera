@@ -6,8 +6,8 @@ This repository contains the Node.js, HTML, JavaScript, and supporting Terraform
 [Ephemera Demo](http://ephemera.sammart.in/)  
 All secrets submitted here are deleted after 24hrs, and for obvious reasons security reasons do not use this as an hosted secret transfer solution!
 ## Setup
-There are a number of resources required in AWS, so it's recommended you follow the [Terraform Setup Guide](wiki/Setup-With-Terraform), which will simplify matters.  
-If you'd rather do it yourself, follow the [Manual Setup Guide](wiki/Manual-Setup)
+There are a number of resources required in AWS, so it's recommended you follow the [Terraform Setup Guide](https://github.com/Sam-Martin/Ephemera/wiki/Setup-With-Terraform), which will simplify matters.  
+If you'd rather do it yourself, follow the [Manual Setup Guide](https://github.com/Sam-Martin/Ephemera/wiki/Manual-Setup)
 ## Overview  
 Ephemera is a one-time secret transfer tool intended to help you in the transition from legacy tools which do not allow secure secret communication (e.g. via password reset URLs or key fingerprints).  
 Ephemera is intended to be simple enough to be audited by someone with a basic understanding of JavaScript and AWS to validate that it is a non-malicous method for password transfer that you can setup in your own AWS account.  
