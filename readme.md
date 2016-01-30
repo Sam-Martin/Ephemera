@@ -1,5 +1,5 @@
 # Ephemera - One time secret distribution
- [![GitHub license](https://img.shields.io/github/license/Sam-Martin/Ephemera.svg)]() [![Build Status](https://img.shields.io/travis/Sam-Martin/Ephemera/master.svg)](https://travis-ci.org/sam-martin/Ephemera)  
+ [![GitHub license](http://i.imgur.com/fkMVzNe.png)]() [![Build Status](https://travis-ci.org/Sam-Martin/Ephemera.svg?branch=master)](https://travis-ci.org/sam-martin/Ephemera)  
  ![Screenshot](http://i.giphy.com/l41lHcOVaBJnKnbEs.gif)  
 This repository contains the Node.js, HTML, JavaScript, and supporting Terraform templates to upload secrets securely to S3 and deliver a one-time URL back to the user.
 ## Demo
