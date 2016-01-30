@@ -4,7 +4,7 @@ node_js:
 install:
  - npm install 
 script:
- - jshint lambda/*.js
- - jshint frontend/js/*.js
+ - jshint ./lambda/
+ - jshint ./frontend/js/
  - prettycss frontend/css/*.css
  - nodeunit run-lambda-tests.js
