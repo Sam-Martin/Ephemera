@@ -40,6 +40,13 @@ resource "aws_s3_bucket_object" "github-logo" {
     content_type = "image/png"
 }
 
+resource "aws_s3_bucket_object" "favicon-logo" {
+    bucket = "${aws_s3_bucket.public_s3_bucket.id}"
+    key = "favicon.ico"
+    source = "${path.module}/../frontend/favicon.ico"
+    content_type = "image/png"
+}
+
 resource "aws_s3_bucket_object" "ephemeracss" {
     bucket = "${aws_s3_bucket.public_s3_bucket.id}"
     key = "css/ephemera.css"

@@ -33,6 +33,7 @@ resource "aws_s3_bucket" "public_s3_bucket" {
       "Action": "s3:GetObject",
       "Resource": [
         "arn:aws:s3:::${var.public_bucket_name}/getSecret.html",
+        "arn:aws:s3:::${var.public_bucket_name}/favicon.ico",
         "arn:aws:s3:::${var.public_bucket_name}/css/*",
         "arn:aws:s3:::${var.public_bucket_name}/img/*",
         "arn:aws:s3:::${var.public_bucket_name}/js/*"
