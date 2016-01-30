@@ -26,14 +26,17 @@ $APISecretKey = Invoke-Terraform -action 'output' -TerraformArgs 's3_signer_secr
 $encryptedOutput = Get-Base64KMSEncryptedString -inputString $APISecretKey -kmsKeyID $kmsKeyID -kmsRegion $kmsRegion
 $script:terraformVars += "-var 'encrypted_s3_url_signer_secret=$encryptedOutput'"
 
-Write-Verbose "Populate the lambda config"
+Write-Verbose "Copy lambda config to output folder"
+Copy-Item .\lambda output\ -Recurse -Force
+
+Write-Verbose "Populate the lambda config in output folder"
 Invoke-Terraform -action 'Apply' -TerraformConfigPath $TerraformConfigPath -TerraformArgs $TerraformVars | Out-Null
 $lambdaConfig = Invoke-Terraform -action 'Output' -TerraformConfigPath $TerraformConfigPath  -TerraformArgs 'lambda-config'
-$lambdaConfig | Set-Content $PSScriptRoot\lambda\common\ephemera-config.js 
+$lambdaConfig | Set-Content $PSScriptRoot\output\lambda\common\ephemera-config.js 
 
 Write-Verbose "Create the lambda zip"
 Remove-Item $PSScriptRoot\ephemera.zip -Force -ErrorAction SilentlyContinue
-ZipFiles -zipfilename $PSScriptRoot\ephemera.zip -sourcedir $PSScriptRoot\lambda\
+ZipFiles -zipfilename $PSScriptRoot\ephemera.zip -sourcedir $PSScriptRoot\output\lambda\
 
 Write-Verbose "Taint the lambda functions so they get recreated"
 Write-Verbose (Invoke-Terraform -action 'taint' -TerraformConfigPath $TerraformConfigPath -TerraformArgs 'aws_lambda_function.ephemera-getsignedurl')
