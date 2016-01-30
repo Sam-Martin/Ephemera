@@ -1,4 +1,4 @@
-resource "aws_iam_access_key" "lb" {
+resource "aws_iam_access_key" "ephemera_s3_url_signer_key" {
     user = "${aws_iam_user.ephemera_s3_url_signer.name}"
 }
 
@@ -77,7 +77,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "ephemera_lambda_role_logger" {
-    name = "${var.lambda_role_name}-s3Uploader"
+    name = "${var.lambda_role_name}-logs"
     role = "${aws_iam_role.ephemera_lambda_role.id}"
     policy = <<EOF
 {
@@ -115,8 +115,8 @@ resource "aws_iam_role" "ephemera_lambda_executor_role" {
 EOF
 }
 
-resource "aws_iam_role_policy" "ephemera_lambda_s3_uploader" {
-    name = "${var.lambda_role_name}-s3Uploader"
+resource "aws_iam_role_policy" "ephemera_lambda_executor_s3_uploader" {
+    name = "${var.lambda_executor_role_name}-s3Uploader"
     role = "${aws_iam_role.ephemera_lambda_executor_role.id}"
     policy = <<EOF
 {
