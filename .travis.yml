@@ -2,8 +2,7 @@ language: node_js
 node_js:
   - "0.11"
 install:
- - npm install jshint -g
- - npm install PrettyCSS -g
+ - npm install 
 script:
  - jshint lambda/*.js
  - jshint frontend/js/*.js

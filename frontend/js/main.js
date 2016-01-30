@@ -76,7 +76,7 @@ $(document).ready(function () {
       $('#file-form [name=policy]').val(result.policy);
       $('#file-form [name=signature]').val(result.signature);
       $('#file-form [name=Content-Type]').val(result['Content-Type']);
-      $('#file-form').attr('action', 'https://'+$.s3BucketName+'.s3.amazonaws.com/')
+      $('#file-form').attr('action', 'https://'+$.s3BucketName+'.s3.amazonaws.com/');
       valuesSet = true;
       $('#file-form').submit();
       valuesSet = false;
@@ -88,7 +88,7 @@ $(document).ready(function () {
     ev.preventDefault();
     $.post($.apiUrl + '/addTextSecret', JSON.stringify({ 'secretText': $('#secret-text').val() }), function (result) {
       if(result.ErrorMessage){
-        alert(result.ErrorMessage)
+        alert(result.ErrorMessage);
       } else {
         populateSecretURL(window.location.origin + '?key=' + result.key);
       }
