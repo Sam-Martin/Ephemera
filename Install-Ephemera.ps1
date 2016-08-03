@@ -14,9 +14,12 @@ Remove-Module Install-Ephemera -ErrorAction SilentlyContinue
 Import-Module $PSScriptRoot\Install-Ephemera.psm1
 
 
-
 Write-Verbose "Check the output folder exists"
 if(!(Test-Path $PSScriptRoot\output)){New-Item $PSScriptRoot\output -ItemType container}
+
+Write-Verbose "Create initial lambda zip from template"
+Remove-Item $PSScriptRoot\ephemera.zip -Force -ErrorAction SilentlyContinue
+ZipFiles -zipfilename $PSScriptRoot\ephemera.zip -sourcedir $PSScriptRoot\lambda\
 
 Write-Verbose "Perform the initial Terraform create with placeholder values"
 Invoke-Terraform -action 'Apply' -TerraformConfigPath $TerraformConfigPath | Out-Null
@@ -32,7 +35,7 @@ Copy-Item .\lambda output\ -Recurse -Force
 Write-Verbose "Populate the lambda config in output folder"
 Invoke-Terraform -action 'Apply' -TerraformConfigPath $TerraformConfigPath -TerraformArgs $TerraformVars | Out-Null
 $lambdaConfig = Invoke-Terraform -action 'Output' -TerraformConfigPath $TerraformConfigPath  -TerraformArgs 'lambda-config'
-$lambdaConfig | Set-Content $PSScriptRoot\output\lambda\common\ephemera-config.js 
+$lambdaConfig | Set-Content $PSScriptRoot\output\lambda\common\ephemera-config.js
 
 Write-Verbose "Create the lambda zip"
 Remove-Item $PSScriptRoot\ephemera.zip -Force -ErrorAction SilentlyContinue
@@ -55,7 +58,7 @@ $apiID = Invoke-Terraform -action 'output' -TerraformArgs 'api_gateway_id' -Terr
 if($apiID -ne 'placeholder'){
     Write-Verbose "Cleaning up $apiID"
     try{
-        Remove-AGRestApi -RestApiId $apiID -Force -ErrorAction SilentlyContinue 
+        Remove-AGRestApi -RestApiId $apiID -Force -ErrorAction SilentlyContinue
     }catch{
     }
 }
@@ -93,5 +96,5 @@ Write-Verbose "Upload the latest files"
 Invoke-Terraform -action 'Apply' -TerraformConfigPath $TerraformConfigPath -TerraformArgs $TerraformVars | Out-Null
 
 Write-Verbose "Grant KMS Decrypt to Lambda Role"
-$lambdaRoleARN = Invoke-Terraform -action 'output' -TerraformArgs 'lambda_role_arn' -TerraformConfigPath $TerraformConfigPath 
+$lambdaRoleARN = Invoke-Terraform -action 'output' -TerraformArgs 'lambda_role_arn' -TerraformConfigPath $TerraformConfigPath
 New-KMSGrant -KeyId $kmsKeyID -GranteePrincipal $lambdaRoleARN -Operation @("Decrypt") -region $kmsRegion -Name "ephemera-terraform" | Out-Null
