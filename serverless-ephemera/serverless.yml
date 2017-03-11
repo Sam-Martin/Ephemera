@@ -1,0 +1,120 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: serverless-ephemera
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+custom:
+    public_bucket_name: "ephemera-v2-public"
+    private_bucket_name: "ephemera-v2-private"
+
+provider:
+  name: aws
+  runtime: nodejs4.3
+  stage: dev
+  region: eu-west-1
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        -  "s3:PutObject*"
+        -  "s3:GetObject"
+        -  "s3:DeleteObject"
+      Resource:
+        - Fn::Join:
+          - ""
+          - - "arn:aws:s3:::"
+            - ${self:custom.private_bucket_name}
+            - "/*"
+        - Fn::Join:
+          - ""
+          - - "arn:aws:s3:::"
+            - ${self:custom.private_bucket_name}
+        - Fn::Join:
+          - ""
+          - - "arn:aws:s3:::"
+            - ${self:custom.public_bucket_name}
+            - "/*"
+        - Fn::Join:
+          - ""
+          - - "arn:aws:s3:::"
+            - ${self:custom.public_bucket_name}
+
+# you can define service wide environment variables here
+#  environment:
+#    variable1: value1
+
+# you can add packaging information here
+package:
+  include:
+    - ../lambda/**
+#  exclude:
+#    - exclude-me.js
+#    - exclude-me-dir/**
+
+functions:
+  ephemera-addtextsecret:
+    handler: lambda/ephemera-addtextsecret/ephemera-addtextsecret.handler
+    events:
+      - http:
+          path: v1/addTextSecret
+          method: post
+  ephemera-getsecret:
+    handler: lambda/ephemera-getsecret/ephemera-getsecret.handler
+    events:
+      - http:
+          path: v1/getSecret
+          method: post
+  ephemera-getsignedurl:
+    handler: lambda/ephemera-getsignedurl/ephemera-getsignedurl.handler
+    events:
+      - http:
+          path: v1/getSecretUploadSignature
+          method: post
+#      - s3: ${env:BUCKET}
+#      - schedule: rate(10 minutes)
+#      - sns: greeter-topic
+#      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
+#      - alexaSkill
+#      - iot:
+#          sql: "SELECT * FROM 'some_topic'"
+#      - cloudwatchEvent:
+#          event:
+#            source:
+#              - "aws.ec2"
+#            detail-type:
+#              - "EC2 Instance State-change Notification"
+#            detail:
+#              state:
+#                - pending
+
+#    Define function environment variables here
+#    environment:
+#      variable2: value2
+
+# you can add CloudFormation resource templates here
+resources:
+  Resources:
+    PublicBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName:  ${self:custom.public_bucket_name}
+    PrivateBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.private_bucket_name}
+#  Outputs:
+#     NewOutput:
+#       Description: "Description for the output"
+#       Value: "Some output value"
