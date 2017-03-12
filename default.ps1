@@ -1,4 +1,4 @@
-task default -depends prerequisites,deploy-serverless,deploy-s3bucketcontents
+task default -depends prerequisites,deploy-serverless, configure-frontend, deploy-s3bucketcontents
 
 task prerequisites {
     if(!(Get-Command 'npm')){
@@ -35,15 +35,32 @@ task configure-frontend {
     Set-Content .\frontend\js\frontend_config.js -Value "`$.apiUrl = '$APIUrl';"
 }
 
-task deploy-s3bucketcontents{ 
-    $ConfgFile = Get-Content 'serverless-ephemera\config.yml' | Out-String
-    $config = ConvertFrom-Yaml -Yaml $ConfgFile
-    $publicFiles = Get-ChildItem frontend -Recurse | ?{!$_.psiscontainer}
-    foreach ($file in $publicFiles) {
-        $RelativePath = $file.fullname -replace [Regex]::Escape($PSScriptRoot+'\frontend'), ''
+task deploy-s3bucketcontents { 
+    $ConfigFile = Get-Content 'serverless-ephemera\config.yml' | Out-String
+    $Config = ConvertFrom-Yaml -Yaml $ConfigFile
+    $PublicFiles = Get-ChildItem frontend -Recurse | ?{!$_.psiscontainer}
+    foreach ($File in $PublicFiles) {
+        $RelativePath = $File.fullname -replace [Regex]::Escape($PSScriptRoot+'\frontend'), ''
         Write-Verbose "Uploading $file to $RelativePath in $($config.public_bucket_name)"
-	    Write-S3Object -BucketName $config.public_bucket_name -File $file.fullname -Key $RelativePath -Region $config.region -CannedACLName public-read
+	    Write-S3Object -BucketName $Config.public_bucket_name -File $file.fullname -Key $RelativePath -Region $Config.region -CannedACLName public-read
     }
 
 }
-   
+
+task destroy {
+    $ConfigFile = Get-Content 'serverless-ephemera\config.yml' | Out-String
+    $Config = ConvertFrom-Yaml -Yaml $ConfigFile
+
+    while(Get-S3Object -BucketName $config.public_bucket_name | Remove-S3Object -Force -region $config.region -BucketName $config.public_bucket_name){
+       Write-Host "Deleting objects from public s3 bucket..."
+    }
+
+    while(Get-S3Object -BucketName $config.private_bucket_name | Remove-S3Object -Force -region $config.region -BucketName $config.private_bucket_name){
+       Write-Host "Deleting objects from private s3 bucket..."
+    }
+
+    Push-Location serverless-ephemera
+    serverless remove
+    Pop-Location
+}
+    
