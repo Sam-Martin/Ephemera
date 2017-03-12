@@ -11,4 +11,4 @@ before_build:
   - ps: Install-Package -Name AWSPowerShell.NetCore -Source https://www.powershellgallery.com/api/v2/ -ProviderName NuGet -ExcludeVersion
   - cmd: npm install serverless -g
 build_script:
-  - ps: $result=Invoke-PSake;exit !$result
+  - ps: Invoke-PSake;exit !($psake.build_success) 

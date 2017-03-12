@@ -5,7 +5,6 @@ var YAML = require("yamljs");
 var s3functions = require('../common/ephemera-s3functions.js');
 var config = YAML.load('config.yml');
 exports.handler = function (event, context,callback) {
-  console.log(JSON.stringify(event))
   // Support variable mapping for both application/json and null content-type headers
   if(typeof(event.body.secretText) == "undefined"){
     secret = event.secretText
