@@ -10,4 +10,4 @@ before_build:
   - ps: Install-Module -Name psake
   - cmd: npm install serverless -g
 build_script:
-  - ps: Set-AWSCredentials -AccessKey $env:AWS_ACCESS_KEY_ID -SecretKey $env:AWS_SECRET_ACCESS_KEY;$_Invoke-PSake;exit !($psake.build_success) 
+  - ps: Set-AWSCredentials -AccessKey $env:AWS_ACCESS_KEY_ID -SecretKey $env:AWS_SECRET_ACCESS_KEY;Invoke-PSake;exit !($psake.build_success) 
