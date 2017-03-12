@@ -1,0 +1,14 @@
+environment:
+  nodejs_version: "6"
+  AWS_ACCESS_KEY_ID:
+    secure: GTugF8P8oc1I2PfKlS4IbsawsWycsenxVFm2uiKgX0
+  AWS_SECRET_ACCESS_KEY: 
+    secure: gr9U/yPc+a5kW3LRTtQnygY0EhPODJwF1H5M4EQ2x2qms/kpb5qHKp37uNv6FrMX
+before_build:
+  - ps: Install-Product node $env:nodejs_version
+  - ps: Install-Module -Name powershell-yaml
+  - ps: Install-Module -Name psake
+  - ps: Install-Package -Name AWSPowerShell.NetCore -Source https://www.powershellgallery.com/api/v2/ -ProviderName NuGet -ExcludeVersion
+  - cmd: npm install serverless
+build_script:
+  - ps: Invoke-PSake
