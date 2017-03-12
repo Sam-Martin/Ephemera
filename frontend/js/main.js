@@ -53,40 +53,17 @@ $(document).ready(function () {
     });
   }
   
-  // Upload a file
-  $('#file-form').submit(function (ev) {
-    
-    if (valuesSet) {
-      return true;
-    }
 
-    ev.preventDefault();
-    $.get($.apiUrl + '/getSecretUploadSignature', {
-      'Content-Type': $('#file-select')[0].files[0].type,
-      redirectTo: location.href
-    }, function (result) {
-      if (result.errorMessage) {
-        alert(result.errorMessage);
-        return;
-      }
-      $('#file-form [name=AWSAccessKeyId]').val(result.AWSAccessKeyId);
-      $('#file-form [name=key]').val(result.key);
-      $('#file-form [name=acl]').val(result.acl);
-      $('#file-form [name=success_action_redirect]').val(result.success_action_redirect);
-      $('#file-form [name=policy]').val(result.policy);
-      $('#file-form [name=signature]').val(result.signature);
-      $('#file-form [name=Content-Type]').val(result['Content-Type']);
-      $('#file-form').attr('action', 'https://'+$.s3BucketName+'.s3.amazonaws.com/');
-      valuesSet = true;
-      $('#file-form').submit();
-      valuesSet = false;
-    });
-  });
-  
   // Upload a string
   $('#text-form').submit(function (ev) {
     ev.preventDefault();
-    $.post($.apiUrl + '/addTextSecret', JSON.stringify({ 'secretText': $('#secret-text').val() }), function (result) {
+    $.ajax({
+        url: $.apiUrl + '/addTextSecret', 
+        method: 'post',
+        data: JSON.stringify({ 'secretText': $('#secret-text').val() }),
+        contentType: "application/json"
+
+    }).done(function (result) {
       if(result.ErrorMessage){
         alert(result.ErrorMessage);
       } else {

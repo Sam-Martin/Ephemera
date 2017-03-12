@@ -1,0 +1,5 @@
+public_bucket_name: ephemera-v2-public
+client:
+    public_bucket_name: ${self:custom.public_bucket_name}
+private_bucket_name: ephemera-v2-private
+region: eu-west-1

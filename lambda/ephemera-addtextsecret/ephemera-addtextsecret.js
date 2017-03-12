@@ -1,28 +1,39 @@
 console.log('Loading event');
 var aws = require('aws-sdk');
 var s3 = new aws.S3();
+var YAML = require("yamljs");
 var s3functions = require('../common/ephemera-s3functions.js');
-var config = require('../common/ephemera-config.js').config();
-exports.handler = function (event, context) {
+var config = YAML.load('config.yml');
+exports.handler = function (event, context,callback) {
+  console.log(JSON.stringify(event))
+  // Support variable mapping for both application/json and null content-type headers
+  if(typeof(event.body.secretText) == "undefined"){
+    secret = event.secretText
+    console.log("Using event.secretText found: " + secret)
+  }else{
+    secret = event.body.secretText
+    console.log("Using event.body.secretText found: " + secret)
+  }
   // Generate a UUID for a key
   var bucketKey = s3functions.generateUUID();
   // Upload the object to s3
   s3.putObject({
-    Bucket: config.bucketName,
+    Bucket: config.private_bucket_name,
     Key: bucketKey,
     ACL: config.s3ACL,
-    Body: event.secretText,
+    Body: secret,
     ContentDisposition: 'inline',
     ContentType: 'text/plain'
   }, function (err, data) {
     if (err) {
-      context.fail('Error adding object to bucket ' + config.bucketName + ' - ' + JSON.stringify(err));
+      callback('Error adding object to bucket ' + config.private_bucket_name + ' - ' + JSON.stringify(err));
     }
-    context.done(null, {
+    console.log("Successfully put " + bucketKey + " into " + config.private_bucket_name)
+    callback(null, {
       key: bucketKey,
-      bucketName: config.bucketName,
-      bucketRegion: config.bucketRegion,
-      objectURL: 'https://s3-' + config.bucketRegion + '.amazonaws.com/' + config.bucketName + '/' + bucketKey
+      bucketName: config.private_bucket_name,
+      bucketRegion: config.region,
+      objectURL: 'https://s3-' + config.region + '.amazonaws.com/' + config.private_bucket_name + '/' + bucketKey
     });
   });
 };
