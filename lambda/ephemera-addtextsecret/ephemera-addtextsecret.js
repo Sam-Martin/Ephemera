@@ -25,7 +25,8 @@ exports.handler = function (event, context,callback) {
     ContentType: 'text/plain'
   }, function (err, data) {
     if (err) {
-      callback('Error adding object to bucket ' + config.private_bucket_name + ' - ' + JSON.stringify(err));
+      callback(new Error('Error adding object to bucket ' + config.private_bucket_name + ' - ' + JSON.stringify(err)));
+      return;
     }
     console.log("Successfully put " + bucketKey + " into " + config.private_bucket_name)
     callback(null, {

@@ -8,15 +8,19 @@ exports.handler = function (event, context, callback) {
     Bucket: config.private_bucket_name,
     'Key': event.query.key
   }, function (err, getData) {
-    if (err)
-      callback('Error loading object' + JSON.stringify(err.stack));
+    if (err){
+      callback(new Error('Error loading object' + JSON.stringify(err.stack)));
+      return;
+    }
     // Delete the object before we return its contnets
     s3.deleteObject({
       Bucket:  config.private_bucket_name,
       'Key': event.query.key
     }, function (err, deleteData) {
-      if (err)
-        callback('Error deleting object' + JSON.stringify(err.stack));
+      if (err){
+        callback(new Error('Error deleting object' + JSON.stringify(err.stack)));
+        return;
+      }
       console.log('Loaded handler');
       if (getData.ContentType == 'text/plain') {
         body = getData.Body.toString();

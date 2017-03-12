@@ -8,6 +8,9 @@ before_build:
   - ps: Install-Product node $env:nodejs_version
   - ps: Install-Module -Name powershell-yaml
   - ps: Install-Module -Name psake
+  - ps: Install-Module -Name pester
   - cmd: npm install serverless -g
 build_script:
   - ps: Set-AWSCredentials -AccessKey $env:AWS_ACCESS_KEY_ID -SecretKey $env:AWS_SECRET_ACCESS_KEY;Invoke-PSake;exit !($psake.build_success) 
+after_build:
+  - ps: Set-AWSCredentials -AccessKey $env:AWS_ACCESS_KEY_ID -SecretKey $env:AWS_SECRET_ACCESS_KEY;Invoke-PSake -taskList destroy;

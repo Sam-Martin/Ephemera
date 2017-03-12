@@ -1,4 +1,9 @@
-task default -depends prerequisites,deploy-serverless, configure-frontend, deploy-s3bucketcontents
+properties {
+    if(!$stage){
+        $stage = 'dev';
+    }
+}
+task default -depends prerequisites,deploy-serverless, configure-frontend, deploy-s3bucketcontents, test
 
 task prerequisites {
     if(!(Get-Command 'npm')){
@@ -13,13 +18,16 @@ task prerequisites {
     if(!(Get-Command 'ConvertFrom-YAML' -EA SilentlyContinue)){
         throw "Powershell-Yaml not found! Please run 'Install-Module -Name powershell-yaml'";
     }
+    if(!(Get-Command 'Invoke-Pester' -EA SilentlyContinue)){
+        throw "Pester not found! Please run 'Install-Module -name pester'"
+    }
     Write-Verbose "Pre-requisites checked successfully"
 }
 
 task deploy-serverless {
     
     Push-Location serverless-ephemera
-    serverless deploy
+    serverless deploy --stage $stage
     Pop-Location
 }
 
@@ -47,6 +55,14 @@ task deploy-s3bucketcontents {
 
 }
 
+task test {
+    $testResults = Invoke-Pester -PassThru
+    if ($testResults.FailedCount -gt 0) {
+        $testResults | Format-List
+        Write-Error -Message 'One or more Pester tests failed. Build cannot continue!'
+    }
+}
+
 task destroy {
     $ConfigFile = Get-Content 'serverless-ephemera\config.yml' | Out-String
     $Config = ConvertFrom-Yaml -Yaml $ConfigFile
@@ -63,4 +79,4 @@ task destroy {
     serverless remove
     Pop-Location
 }
-    
+   
