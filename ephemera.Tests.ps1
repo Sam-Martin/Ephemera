@@ -8,7 +8,7 @@ $Config = ConvertFrom-Yaml -Yaml $ConfigFile
 
 $global:PublicWebsite = "http://{0}.s3-website-{1}.amazonaws.com" -f $config.public_bucket_name, $config.region
     
-$ServerlessInfo -match 'POST - (?<url>.*/v1)' | Out-Null
+$ServerlessInfo -match 'POST - (?<url>.*/v2)' | Out-Null
 $APIUrl = $Matches.url
 
 Describe "Ephemera" {

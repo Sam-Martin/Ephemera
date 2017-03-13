@@ -66,7 +66,7 @@ functions:
     handler: lambda/ephemera-addtextsecret/ephemera-addtextsecret.handler
     events:
       - http:
-          path: v1/addTextSecret
+          path: v2/addTextSecret
           method: post
           integration: lambda
           cors: true
@@ -76,7 +76,7 @@ functions:
     handler: lambda/ephemera-getsecret/ephemera-getsecret.handler
     events:
       - http:
-          path: v1/getSecret
+          path: v2/getSecret
           method: get
           integration: lambda
           cors: true

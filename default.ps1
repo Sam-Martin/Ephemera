@@ -42,7 +42,7 @@ task configure-frontend {
     $ServerlessInfo = &"serverless" "info" | Out-String
     Pop-Location
     
-    $ServerlessInfo -match 'POST - (?<url>.*/v1)' | Out-Null
+    $ServerlessInfo -match 'POST - (?<url>.*/v2)' | Out-Null
     $APIUrl = $Matches.url
     
     Write-Verbose "Configuring frontend_config.js to reflect api url of '$APIUrl'";
