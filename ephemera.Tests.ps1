@@ -1,6 +1,10 @@
-﻿# Get endpoint URL
+﻿if(!$stage){
+    $stage = 'dev'
+}
+
+# Get endpoint URL
 Push-Location serverless-ephemera
-$ServerlessInfo = &"serverless" "info" | Out-String
+$ServerlessInfo = &"serverless" "info" "--stage" $stage | Out-String
 Pop-Location
 
 $ConfigFile = Get-Content 'serverless-ephemera\config.yml' | Out-String
@@ -10,6 +14,9 @@ $global:PublicWebsite = "http://{0}.s3-website-{1}.amazonaws.com" -f $config.pub
     
 $ServerlessInfo -match 'POST - (?<url>.*/v2)' | Out-Null
 $APIUrl = $Matches.url
+
+Write-Verbose "Checking stage: $ServerlessInfo"
+Write-Verbose "Checking API URL: $APIUrl"
 
 Describe "Ephemera" {
     It "Returns a valid secret url!" {
@@ -28,5 +35,8 @@ Describe "Ephemera" {
     }
     It "Should return a 200 on the public URL" {
         (Invoke-WebRequest $global:PublicWebsite -UseBasicParsing).StatusCode | Should Be 200
+    }
+    It "Should have the API URL in the front end config js" {
+        (Invoke-WebRequest $global:PublicWebsite/js/frontend_config.js -UseBasicParsing).content | Should match $APIUrl
     }
 }

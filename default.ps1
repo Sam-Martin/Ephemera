@@ -1,6 +1,8 @@
 properties {
     if(!$stage){
-        $stage = 'dev';
+        $global:stage = 'dev';
+    }else{
+        $global:stage = $stage;
     }
 }
 task default -depends prerequisites,build, deploy-serverless, configure-frontend, deploy-s3bucketcontents, test
@@ -39,7 +41,7 @@ task deploy-serverless {
 
 task configure-frontend {
     Push-Location serverless-ephemera
-    $ServerlessInfo = &"serverless" "info" | Out-String
+    $ServerlessInfo = &"serverless" "info" "--stage" $stage | Out-String
     Pop-Location
     
     $ServerlessInfo -match 'POST - (?<url>.*/v2)' | Out-Null
