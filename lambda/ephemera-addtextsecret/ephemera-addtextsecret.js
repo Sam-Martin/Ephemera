@@ -5,14 +5,7 @@ var YAML = require("yamljs");
 var s3functions = require('../common/ephemera-s3functions.js');
 var config = YAML.load('config.yml');
 exports.handler = function (event, context,callback) {
-  // Support variable mapping for both application/json and null content-type headers
-  if(typeof(event.body.secretText) == "undefined"){
-    secret = event.secretText
-    console.log("Using event.secretText found: " + secret)
-  }else{
-    secret = event.body.secretText
-    console.log("Using event.body.secretText found: " + secret)
-  }
+  console.log('Loaded handler');
   // Generate a UUID for a key
   var bucketKey = s3functions.generateUUID();
   // Upload the object to s3
@@ -20,7 +13,7 @@ exports.handler = function (event, context,callback) {
     Bucket: config.private_bucket_name,
     Key: bucketKey,
     ACL: config.s3ACL,
-    Body: secret,
+    Body: event.body.secretText,
     ContentDisposition: 'inline',
     ContentType: 'text/plain'
   }, function (err, data) {
@@ -28,7 +21,7 @@ exports.handler = function (event, context,callback) {
       callback(new Error('Error adding object to bucket ' + config.private_bucket_name + ' - ' + JSON.stringify(err)));
       return;
     }
-    console.log("Successfully put " + bucketKey + " into " + config.private_bucket_name)
+    console.log("Successfully put " + bucketKey + " into " + config.private_bucket_name);
     callback(null, {
       key: bucketKey,
       bucketName: config.private_bucket_name,

@@ -4,6 +4,7 @@ var YAML = require("yamljs");
 var s3 = new aws.S3();
 var config = YAML.load('config.yml');
 exports.handler = function (event, context, callback) {  
+  console.log('Loaded handler');
   s3.getObject({
     Bucket: config.private_bucket_name,
     'Key': event.query.key
@@ -12,6 +13,7 @@ exports.handler = function (event, context, callback) {
       callback(new Error('Error loading object' + JSON.stringify(err.stack)));
       return;
     }
+    console.log("Successfully loaded secret: " + event.query.key);
     // Delete the object before we return its contnets
     s3.deleteObject({
       Bucket:  config.private_bucket_name,
@@ -21,7 +23,7 @@ exports.handler = function (event, context, callback) {
         callback(new Error('Error deleting object' + JSON.stringify(err.stack)));
         return;
       }
-      console.log('Loaded handler');
+      console.log("Successfully deleted secret: " + event.query.key);
       if (getData.ContentType == 'text/plain') {
         body = getData.Body.toString();
       } else {

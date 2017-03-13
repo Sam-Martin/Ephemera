@@ -11,6 +11,6 @@ before_build:
   - ps: Install-Module -Name pester
   - cmd: npm install serverless -g
 build_script:
-  - ps: Set-AWSCredentials -AccessKey $env:AWS_ACCESS_KEY_ID -SecretKey $env:AWS_SECRET_ACCESS_KEY;Invoke-PSake;write-host "exiting with code ([int]!$psake.build_success)";
+  - ps: Set-AWSCredentials -AccessKey $env:AWS_ACCESS_KEY_ID -SecretKey $env:AWS_SECRET_ACCESS_KEY;Invoke-PSake;write-host "exiting with code $([int]!$psake.build_success)";
 after_build:
-  - ps: Set-AWSCredentials -AccessKey $env:AWS_ACCESS_KEY_ID -SecretKey $env:AWS_SECRET_ACCESS_KEY;Invoke-PSake -taskList destroy;exit ([int]!$psake.build_success)
+  - ps: Set-AWSCredentials -AccessKey $env:AWS_ACCESS_KEY_ID -SecretKey $env:AWS_SECRET_ACCESS_KEY;Invoke-PSake -taskList destroy;write-host "exiting with code $([int]!$psake.build_success)";
