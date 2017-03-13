@@ -1,0 +1,11 @@
+{
+  "name": "ephemera",
+  "description": "Lambda functions for Ephemera",
+  "license": "Apache 2.0",
+  "private": true,
+  "version": "0.2.0",
+  "description": "",
+  "dependencies": {
+    "yamljs": "^0.2.8"
+  }
+}

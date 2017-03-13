@@ -1,68 +1,57 @@
 <html>
-    <head>
-        <title>Ephemera</title>
-        <!-- Latest jQuery -->
-        <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-        <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-        <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
-        <!-- CSS specific to this page -->
-        <link rel="stylesheet" href="css/ephemera.css">
+	<head>
+		<title>Ephemera</title>
+		<!-- Latest jQuery -->
+		<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+		<!-- CSS specific to this page -->
+		<link rel="stylesheet" href="css/ephemera.css">
 
 
-        <!-- Latest compiled and minified JavaScript -->
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-        <!-- The main JS for bringing it all together on this page -->
-        <script src="js/main.js"></script>
-        <!-- The config js that contains replacable values -->
-        <script src="js/frontend_config.js"></script>
-    </head>
-    <body>
-        <nav class="navbar navbar-inverse navbar-fixed-top">
-            <div class="container">
-                <div class="navbar-header"><h3><img src="img/ephemera-log-no-background.png" class="logo_small"/> Ephemera - One Time Password Transfer</h3></div>
-                <div class="nav navbar-nav navbar-right"><h3><a href="https://github.com/Sam-Martin/Ephemera/"><img src="img/GitHub-Mark-Light-120px-plus.png"/></a></h3></div>
-            </div>
-        </nav>
-        <div class="jumbotron" id="pageSubtitle">
-            <div class="container text-center">
-            	
-            	<h1>Ephemera</h1>
-                <h2>Secret Transfer</h2>
-                <p>Select a file (less than 500k) you wish to upload to be provided with a one-time use URL to access it.</p>
-            </div>
-        </div>
-        <div class="container" id="pageBody">
-        	<div class="row">
-	        	<div class="col-md-6">
-		            <h1>Text Entry</h1>
-		            <form id="text-form">
-		                <input type="password" id="secret-text"/>
-		                <input type="submit" value="Submit">
-		            </form>
+		<!-- Latest compiled and minified JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+		<!-- The main JS for bringing it all together on this page -->
+		<script src="js/main.js"></script>
+		<!-- The config js that contains replacable values -->
+		<script src="js/frontend_config.js"></script>
+	</head>
+	<body>
+		<nav class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-header"><h3><img src="img/ephemera-log-no-background.png" class="logo_small"/> Ephemera - One Time Password Transfer</h3></div>
+				<div class="nav navbar-nav navbar-right"><h3><a href="https://github.com/Sam-Martin/Ephemera/"><img src="img/GitHub-Mark-Light-120px-plus.png"/></a></h3></div>
+			</div>
+		</nav>
+		<div class="jumbotron" id="pageSubtitle">
+			<div class="container text-center">
+				
+				<h1>Ephemera</h1>
+				<h2>Secret Transfer</h2>
+				<p>Enter a text secret and you will be provided with a one-time use URL to give to the intended secret recipient.</p>
+			</div>
+		</div>
+		<div class="container" id="pageBody">
+			<div class="row">
+				<div class="col-md-12">
+					<h1>Text Entry</h1>
+					<form id="text-form">
+						<p>
+							<textarea id="secret-text" rows="4" cols="50"></textarea>
+						</p>
+						<p>
+							<input type="submit" value="Submit">
+						</p>
+					</form>
 				</div>
-				<div class="col-md-6">
-		            <h1>Upload File</h1>
-		            <form id="file-form" method="post" enctype="multipart/form-data">
-		              <input type="hidden" name="key" value="">
-		              <input type="hidden" name="AWSAccessKeyId" value=""> 
-		              <input type="hidden" name="acl" value=""> 
-		              <input type="hidden" name="success_action_redirect" value="">
-		              <input type="hidden" name="policy" value="">
-		              <input type="hidden" name="signature" value="">
-		              <input type="hidden" name="Content-Type" value="">
+			</div>
+			<div id="secretOutput">
+				<h1>Secret URL</h1>
+				<pre id="secretURL">...</pre>
+			</div>
 
-						<input type="file" name="file" id="file-select" accept="image/*"/>
-						<input type="Submit" Value="Submit"/>
-		            </form>
-		        </div>
-		    </div>
-            <div id="secretOutput">
-                <h1>Secret URL</h1>
-                <p id="secretURL">...</p>
-            </div>
-
-        </div>
-    </body>
+		</div>
+	</body>
 </head>

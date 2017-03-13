@@ -5,3 +5,4 @@ terraform.tfvars
 terraform.tfstate*
 output/*
 node_modules
+.serverless
