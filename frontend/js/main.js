@@ -46,10 +46,8 @@ $(document).ready(function () {
       if (result.errorMessage) {
         secretArea.append('Secret no longer exists');
       } else if (result['Content-Type'] == 'text/plain') {
-        secretArea.append(result.body);
-      } else {
-        secretArea.append('<img src="data:' + result['Content-Type'] + ';base64,' + result.body + '"/>');
-      }
+        secretArea.append("<pre>"+result.body+"</pre>");
+      } 
     });
   }
   
