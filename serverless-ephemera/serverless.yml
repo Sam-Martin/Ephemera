@@ -22,7 +22,7 @@ provider:
   name: aws
   runtime: nodejs4.3
   stage: dev
-  region: eu-west-1
+  region: ${self:custom.region}
   iamRoleStatements:
     - Effect: "Allow"
       Action:
