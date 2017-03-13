@@ -2,6 +2,8 @@
   "name": "ephemera-tests",
   "version": "0.0.1",
   "description": "Tests for Ephemera AWS OTP transfer tool",
+  "license": "Apache 2.0",
+  "private": true,
   "directories": {
     "test": "lambda/test"
   },

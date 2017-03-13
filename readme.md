@@ -1,5 +1,5 @@
 # Ephemera - One time secret distribution
- [![GitHub license](http://i.imgur.com/fkMVzNe.png)]() [![Build Status](https://ci.appveyor.com/api/projects/status/9cgvg2f1y0oolleg?svg=true)](https://ci.appveyor.com/project/Sam-Martin/ephemera)  
+ [![GitHub license](http://i.imgur.com/fkMVzNe.png)]() [![Build Status](https://ci.appveyor.com/api/projects/status/9cgvg2f1y0oolleg/branch/master?svg=true)](https://ci.appveyor.com/project/Sam-Martin/ephemera)  
  ![Screenshot](http://i.giphy.com/l41lHcOVaBJnKnbEs.gif)  
 This repository contains the Node.js, HTML, JavaScript, and supporting [Serverless](https://github.com/serverless/serverless) definition to upload secrets securely to S3 and deliver a one-time URL back to the user.
 ## Demo
