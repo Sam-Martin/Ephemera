@@ -15,8 +15,8 @@ Describe "Ephemera" {
     It "Returns a valid secret url!" {
         $global:TestSecret = "I am a secret, ssh!"
         $Payload = @{secretText = $TestSecret} | ConvertTo-Json
-        $global:AddSecretResult = (Invoke-WebRequest -uri "$APIUrl/addTextSecret" -Body $Payload -UseBasicParsing -Method POST -ContentType "Application/JSON").Content | ConvertFrom-Json
-        $AddSecretResult.Key -match '[\d\w]{8}-[\d\w]{4}-[\d\w]{4}-[\d\w]{4}-[\d\w]{12}' | Should be $true
+        $global:AddSecretResult = (Invoke-WebRequest -uri "$APIUrl/addTextSecret" -Body $Payload -UseBasicParsing -Method POST -ContentType "Application/JSON" -verbose).Content | ConvertFrom-Json
+        $AddSecretResult.Key | Should match '[\d\w]{8}-[\d\w]{4}-[\d\w]{4}-[\d\w]{4}-[\d\w]{12}'
     }
     It "Should return the correct secret!" {
         $GetSecretResult = (Invoke-WebRequest -uri "$APIUrl/getSecret?key=$($AddSecretResult.Key)" -UseBasicParsing -Method GET -verbose).Content | ConvertFrom-Json

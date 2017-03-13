@@ -3,7 +3,7 @@ properties {
         $stage = 'dev';
     }
 }
-task default -depends prerequisites,deploy-serverless, configure-frontend, deploy-s3bucketcontents, test
+task default -depends prerequisites,build, deploy-serverless, configure-frontend, deploy-s3bucketcontents, test
 
 task prerequisites {
     if(!(Get-Command 'npm')){
@@ -22,6 +22,11 @@ task prerequisites {
         throw "Pester not found! Please run 'Install-Module -name pester'"
     }
     Write-Verbose "Pre-requisites checked successfully"
+}
+
+task build {
+    Push-Location lambda
+    npm install
 }
 
 task deploy-serverless {
@@ -76,7 +81,7 @@ task destroy {
     }
 
     Push-Location serverless-ephemera
-    serverless remove
+    serverless remove --stage $stage
     Pop-Location
 }
    
