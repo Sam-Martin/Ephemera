@@ -27,6 +27,7 @@ task prerequisites {
 task build {
     Push-Location lambda
     npm install
+    Pop-Location
 }
 
 task deploy-serverless {
