@@ -96,6 +96,11 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:custom.private_bucket_name}
+        LifecycleConfiguration:
+          Rules:
+            - 
+              ExpirationInDays: ${self:custom.max_secret_age_days}
+              Status: Enabled
   Outputs:
     WebsiteURL:
       Value: 

@@ -15,7 +15,7 @@ $global:PublicWebsite = "http://{0}.s3-website-{1}.amazonaws.com" -f $config.pub
 $ServerlessInfo -match 'POST - (?<url>.*/v2)' | Out-Null
 $APIUrl = $Matches.url
 
-Write-Verbose "Checking stage: $ServerlessInfo"
+Write-Verbose "Checking stage: $stage"
 Write-Verbose "Checking API URL: $APIUrl"
 
 Describe "Ephemera" {

@@ -1,5 +1,6 @@
-public_bucket_name: ephemera-public-dev
+public_bucket_name: ephemera.sammart.in
 client:
     public_bucket_name: ${self:custom.public_bucket_name}
-private_bucket_name: ephemera-private-dev
+private_bucket_name: ephemera.sammart.in-private
 region: eu-west-1
+max_secret_age_days: 14
