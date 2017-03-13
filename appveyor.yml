@@ -10,7 +10,12 @@ before_build:
   - ps: Install-Module -Name psake
   - ps: Install-Module -Name pester
   - cmd: npm install serverless -g
+  - cmd: npm install
 build_script:
   - ps: Set-AWSCredentials -AccessKey $env:AWS_ACCESS_KEY_ID -SecretKey $env:AWS_SECRET_ACCESS_KEY;Invoke-PSake;$host.SetShouldExit([int]!$psake.build_success);
+  - cmd: jshint ./lambda/
+  - cmd: jshint ./frontend/js/
+  - cmd: prettycss frontend/css/*.css
+  - cmd: nodeunit lambda/test
 on_finish:
   - ps: Set-AWSCredentials -AccessKey $env:AWS_ACCESS_KEY_ID -SecretKey $env:AWS_SECRET_ACCESS_KEY;Invoke-PSake -taskList destroy;$host.SetShouldExit([int]!$psake.build_success);
