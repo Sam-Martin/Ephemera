@@ -64,7 +64,14 @@ task deploy-s3bucketcontents {
 }
 
 task test {
-    $testResults = Invoke-Pester -PassThru
+    $testResultsFile = 'TestsResults.xml'
+    $testResults = Invoke-Pester -OutputFormat NUnitXml -OutputFile $testResultsFile -PassThru
+    
+    if ($env:APPVEYOR){
+        Write-Host "Uploading test results to AppVeyor..."
+        (New-Object 'System.Net.WebClient').UploadFile("https://ci.appveyor.com/api/testresults/nunit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $testResultsFile))
+    }
+    
     if ($testResults.FailedCount -gt 0) {
         $testResults | Format-List
         Write-Error -Message 'One or more Pester tests failed. Build cannot continue!'
