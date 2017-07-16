@@ -1,6 +1,6 @@
 public_bucket_name: ephemera-public-dev
 client:
-    public_bucket_name: ${self:custom.public_bucket_name}
+    public_bucket_name: ephemera-public-dev
 private_bucket_name: ephemera-private-dev
 region: us-west-2
 max_secret_age_days: 14
