@@ -1,1 +1,1 @@
-$.apiUrl = 'https://pgxb788fgk.execute-api.eu-west-1.amazonaws.com/dev/v1';
+$.apiUrl = 'https://ewqe8tap80.execute-api.us-west-2.amazonaws.com/dev/v2';

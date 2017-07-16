@@ -86,10 +86,6 @@ task destroy {
        Write-Host "Deleting objects from public s3 bucket..."
     }
 
-    while(Get-S3Object -BucketName $config.private_bucket_name | Remove-S3Object -Force -region $config.region -BucketName $config.private_bucket_name){
-       Write-Host "Deleting objects from private s3 bucket..."
-    }
-
     Push-Location serverless-ephemera
     serverless remove --stage $stage
     Pop-Location

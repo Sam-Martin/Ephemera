@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: serverless-ephemera
+service: serverless-ephemera-local
 plugin: serverless-client-s3
 
 # You can pin your service to only deploy with a specific Serverless version
@@ -25,29 +25,19 @@ provider:
   region: ${self:custom.region}
   iamRoleStatements:
     - Effect: "Allow"
-      Action:
-        -  "s3:PutObject*"
-        -  "s3:GetObject"
-        -  "s3:DeleteObject"
+      Action: 
+        - "dynamodb:GetItem"
+        - "dynamodb:PutItem"
+        - "dynamodb:DeleteItem"
       Resource:
         - Fn::Join:
           - ""
-          - - "arn:aws:s3:::"
-            - ${self:custom.private_bucket_name}
-            - "/*"
-        - Fn::Join:
-          - ""
-          - - "arn:aws:s3:::"
-            - ${self:custom.private_bucket_name}
-        - Fn::Join:
-          - ""
-          - - "arn:aws:s3:::"
-            - ${self:custom.public_bucket_name}
-            - "/*"
-        - Fn::Join:
-          - ""
-          - - "arn:aws:s3:::"
-            - ${self:custom.public_bucket_name}
+          - - "arn:aws:dynamodb:"
+            - ${self:custom.region}
+            - ":"
+            - Ref: 'AWS::AccountId'
+            - ":table/" 
+            - ${self:custom.dynamodb_table_name}
 
 # you can define service wide environment variables here
 #  environment:
@@ -92,15 +82,22 @@ resources:
           IndexDocument: index.html
           ErrorDocument: error.html
         BucketName:  ${self:custom.public_bucket_name}
-    PrivateBucket:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: ${self:custom.private_bucket_name}
-        LifecycleConfiguration:
-          Rules:
-            - 
-              ExpirationInDays: ${self:custom.max_secret_age_days}
-              Status: Enabled
+    dynamoDBTable: 
+      Type: "AWS::DynamoDB::Table"
+      Properties: 
+        AttributeDefinitions: 
+          - 
+            AttributeName: "SecretID"
+            AttributeType: "S"
+        KeySchema: 
+          - 
+            AttributeName: "SecretID"
+            KeyType: "HASH"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        TableName: ${self:custom.dynamodb_table_name}
+
   Outputs:
     WebsiteURL:
       Value: 

@@ -1,32 +1,42 @@
 console.log('Loading event');
-var aws = require('aws-sdk');
-var s3 = new aws.S3();
+var AWS = require('aws-sdk');
 var YAML = require("yamljs");
 var s3functions = require('../common/ephemera-s3functions.js');
 var config = YAML.load('config.yml');
+AWS.config.update({
+  region: config.region,
+  endpoint: "https://dynamodb."+config.region+".amazonaws.com"
+});
+var docClient = new AWS.DynamoDB.DocumentClient();
+
+
 exports.handler = function (event, context,callback) {
   console.log('Loaded handler');
+  
   // Generate a UUID for a key
   var bucketKey = s3functions.generateUUID();
-  // Upload the object to s3
-  s3.putObject({
-    Bucket: config.private_bucket_name,
-    Key: bucketKey,
-    ACL: config.s3ACL,
-    Body: event.body.secretText,
-    ContentDisposition: 'inline',
-    ContentType: 'text/plain'
-  }, function (err, data) {
-    if (err) {
-      callback(new Error('Error adding object to bucket ' + config.private_bucket_name + ' - ' + JSON.stringify(err)));
-      return;
+  
+  var params = {
+    TableName: config.dynamodb_table_name,
+    Item: {
+        SecretID: bucketKey,
+        SecretText: event.body.secretText,
+        Uploaded: new Date().getTime()
     }
-    console.log("Successfully put " + bucketKey + " into " + config.private_bucket_name);
-    callback(null, {
-      key: bucketKey,
-      bucketName: config.private_bucket_name,
-      bucketRegion: config.region,
-      objectURL: 'https://s3-' + config.region + '.amazonaws.com/' + config.private_bucket_name + '/' + bucketKey
-    });
+  };
+
+  // Save the text to DynamoDB
+  docClient.put(params, function(err, data) {
+      if (err) {
+        return callback(null, {
+          Error: "Unable to add item. Error JSON:" + JSON.stringify(err, null, 2)
+        });
+
+      } else {
+            console.log("Successfully put " + bucketKey + " into " + config.dynammodb_table_name);
+            return callback(null, {
+              key: bucketKey
+            });
+      }
   });
 };

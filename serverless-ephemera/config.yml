@@ -1,6 +1,6 @@
-public_bucket_name: ephemera-public-dev
+public_bucket_name: ephemera-public-dev-local
 client:
-    public_bucket_name: ephemera-public-dev
-private_bucket_name: ephemera-private-dev
+    public_bucket_name: ephemera-public-dev-local
+dynamodb_table_name: ephemera-dev-local
 region: us-west-2
 max_secret_age_days: 14
