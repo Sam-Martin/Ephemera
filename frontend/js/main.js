@@ -43,9 +43,9 @@ $(document).ready(function () {
     secretArea.html('<h1>Loading Secret...</h1>');
     $.get($.apiUrl + '/getSecret', { key: urlVars.key }, function (result) {
       secretArea.html('<h1>Secret</h1>');
-      if (result.errorMessage) {
-        secretArea.append('Secret no longer exists');
-      } else if (result['Content-Type'] == 'text/plain') {
+      if (result.ErrorMessage) {
+        secretArea.append(result.ErrorMessage);
+      } else {
         secretArea.append("<pre>"+result.body+"</pre>");
       } 
     });

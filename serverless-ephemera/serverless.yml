@@ -72,6 +72,11 @@ functions:
           cors: true
           request: 
              passThrough: WHEN_NO_MATCH
+  ephemera-ageoffsecret:
+    handler: lambda/ephemera-ageoffsecret/ephemera-ageoffsecret.handler 
+    events: 
+      - schedule: rate(2 hours)
+
 resources:
   Resources:
     PublicBucket:
@@ -89,6 +94,9 @@ resources:
           - 
             AttributeName: "SecretID"
             AttributeType: "S"
+          - 
+            AttributeName: "Uploaded"
+            AttributeType: "N"
         KeySchema: 
           - 
             AttributeName: "SecretID"
@@ -97,6 +105,20 @@ resources:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
         TableName: ${self:custom.dynamodb_table_name}
+        GlobalSecondaryIndexes: 
+        - 
+          IndexName: "Uploaded"
+          KeySchema: 
+            - 
+              AttributeName: "Uploaded"
+              KeyType: "HASH"
+          Projection: 
+            NonKeyAttributes: 
+              - "SecretID"
+            ProjectionType: "INCLUDE"
+          ProvisionedThroughput: 
+            ReadCapacityUnits: "5"
+            WriteCapacityUnits: "5"
 
   Outputs:
     WebsiteURL:
