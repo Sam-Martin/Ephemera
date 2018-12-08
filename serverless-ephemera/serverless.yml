@@ -25,7 +25,7 @@ provider:
   region: ${self:custom.region}
   iamRoleStatements:
     - Effect: "Allow"
-      Action: 
+      Action:
         - "dynamodb:GetItem"
         - "dynamodb:PutItem"
         - "dynamodb:DeleteItem"
@@ -36,8 +36,10 @@ provider:
             - ${self:custom.region}
             - ":"
             - Ref: 'AWS::AccountId'
-            - ":table/" 
+            - ":table/"
             - ${self:custom.dynamodb_table_name}
+plugins:
+  - serverless-s3-sync
 
 # you can define service wide environment variables here
 #  environment:
@@ -60,7 +62,7 @@ functions:
           method: post
           integration: lambda
           cors: true
-          request: 
+          request:
              passThrough: WHEN_NO_MATCH
   ephemera-getsecret:
     handler: lambda/ephemera-getsecret/ephemera-getsecret.handler
@@ -70,11 +72,11 @@ functions:
           method: get
           integration: lambda
           cors: true
-          request: 
+          request:
              passThrough: WHEN_NO_MATCH
   ephemera-ageoffsecret:
-    handler: lambda/ephemera-ageoffsecret/ephemera-ageoffsecret.handler 
-    events: 
+    handler: lambda/ephemera-ageoffsecret/ephemera-ageoffsecret.handler
+    events:
       - schedule: rate(2 hours)
 
 resources:
@@ -87,41 +89,41 @@ resources:
           IndexDocument: index.html
           ErrorDocument: error.html
         BucketName:  ${self:custom.public_bucket_name}
-    dynamoDBTable: 
+    dynamoDBTable:
       Type: "AWS::DynamoDB::Table"
-      Properties: 
-        AttributeDefinitions: 
-          - 
+      Properties:
+        AttributeDefinitions:
+          -
             AttributeName: "SecretID"
             AttributeType: "S"
-          - 
+          -
             AttributeName: "Uploaded"
             AttributeType: "N"
-        KeySchema: 
-          - 
+        KeySchema:
+          -
             AttributeName: "SecretID"
             KeyType: "HASH"
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
         TableName: ${self:custom.dynamodb_table_name}
-        GlobalSecondaryIndexes: 
-        - 
+        GlobalSecondaryIndexes:
+        -
           IndexName: "Uploaded"
-          KeySchema: 
-            - 
+          KeySchema:
+            -
               AttributeName: "Uploaded"
               KeyType: "HASH"
-          Projection: 
-            NonKeyAttributes: 
+          Projection:
+            NonKeyAttributes:
               - "SecretID"
             ProjectionType: "INCLUDE"
-          ProvisionedThroughput: 
+          ProvisionedThroughput:
             ReadCapacityUnits: "5"
             WriteCapacityUnits: "5"
 
   Outputs:
     WebsiteURL:
-      Value: 
+      Value:
         Fn::GetAtt: PublicBucket.WebsiteURL
       Description: URL for the website hosted on S3

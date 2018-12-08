@@ -4,3 +4,7 @@ client:
 dynamodb_table_name: ephemera-dev-local
 region: us-west-2
 max_secret_age_days: 14
+s3Sync:
+  - bucketName: ${self:custom.public_bucket_name} # required
+    localDir: ../frontend
+    
