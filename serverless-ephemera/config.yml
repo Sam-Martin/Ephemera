@@ -1,4 +1,4 @@
-stage: prod
+stage: dev
 public_bucket_name: ephemera-public-sammartin-${self:custom.config.stage}
 dynamodb_table_name: ephemera-${self:custom.config.stage}
 region: eu-west-2
