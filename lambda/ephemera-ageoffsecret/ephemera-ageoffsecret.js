@@ -1,30 +1,43 @@
 console.log('loading event');
 var AWS = require('aws-sdk');
 AWS.config.update({
-  region: config.REGION,
-  endpoint: "https://dynamodb."+config.REGION+".amazonaws.com"
+  region: process.env.REGION,
+  endpoint: "https://dynamodb."+process.env.REGION+".amazonaws.com"
 });
 var docClient = new AWS.DynamoDB.DocumentClient();
 
 exports.handler = function (event, context, callback) {
   console.log('Loaded handler');
 
+  var now = new Date();
   var params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
-      Key: {
-
-      },
-      ConditionExpression:"Uploaded <= :val",
+      FilterExpression:"Uploaded <= :uploaded",
       ExpressionAttributeValues: {
-        ":val": new Date().getTime()
+        ":uploaded": now.setHours(now.getHours() - process.env.MAX_SECRET_AGE_HOURS)
       }
   };
 
-  docClient.delete(params, function(err, data) {
+  docClient.scan(params, function(err, data) {
     if (err) {
-        console.error("Unable to delete item. Error JSON:", JSON.stringify(err, null, 2));
+        console.error("Unable to search for expired items. Error JSON:", JSON.stringify(err, null, 2));
     }
+    data.Items.forEach(function (item) {
+      params = {
+         TableName: process.env.DYNAMODB_TABLE_NAME,
+         Key: {
+           "SecretID": item.SecretID
+          }
+      }
+      docClient.delete(params, function(err, data) {
+         if (err) {
+          console.error("Unable to delete item. Error JSON:", JSON.stringify(err, null, 2));
+          return
+         }
+         console.log(data)
+      })
+    })
+    console.log(data)
   })
-
 
 }

@@ -36,6 +36,7 @@ provider:
       Action:
         - "dynamodb:GetItem"
         - "dynamodb:PutItem"
+        - "dynamodb:Scan"
         - "dynamodb:DeleteItem"
       Resource:
         - Fn::Join:
@@ -90,6 +91,8 @@ functions:
           cors: true
   EphemeraAgeOffSecret:
     handler: lambda/ephemera-ageoffsecret/ephemera-ageoffsecret.handler
+    environment:
+      MAX_SECRET_AGE_HOURS: ${self:custom.config.max_secret_age_hours}
     events:
       - schedule: rate(2 hours)
   EphemeraPopulateStaticSiteConfig:
@@ -137,31 +140,12 @@ resources:
           -
             AttributeName: "SecretID"
             AttributeType: "S"
-          -
-            AttributeName: "Uploaded"
-            AttributeType: "N"
         KeySchema:
           -
             AttributeName: "SecretID"
             KeyType: "HASH"
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
         TableName: ${self:custom.config.dynamodb_table_name}
-        GlobalSecondaryIndexes:
-        -
-          IndexName: "Uploaded"
-          KeySchema:
-            -
-              AttributeName: "Uploaded"
-              KeyType: "HASH"
-          Projection:
-            NonKeyAttributes:
-              - "SecretID"
-            ProjectionType: "INCLUDE"
-          ProvisionedThroughput:
-            ReadCapacityUnits: "5"
-            WriteCapacityUnits: "5"
+        BillingMode: PAY_PER_REQUEST
 
   Outputs:
     WebsiteURL:
