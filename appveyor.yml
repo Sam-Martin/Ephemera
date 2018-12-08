@@ -13,5 +13,3 @@ before_build:
   - cmd: cd serverless-ephemera && npm install serverless-s3-sync --save
 build_script:
   - ps: Set-AWSCredentials -AccessKey $env:AWS_ACCESS_KEY_ID -SecretKey $env:AWS_SECRET_ACCESS_KEY;Invoke-PSake;$host.SetShouldExit([int]!$psake.build_success);
-on_finish:
-  - ps: Set-AWSCredentials -AccessKey $env:AWS_ACCESS_KEY_ID -SecretKey $env:AWS_SECRET_ACCESS_KEY;Invoke-PSake -taskList destroy;$host.SetShouldExit([int]!$psake.build_success);
