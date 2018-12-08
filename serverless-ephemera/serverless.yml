@@ -136,6 +136,8 @@ resources:
     dynamoDBTable:
       Type: "AWS::DynamoDB::Table"
       Properties:
+        SSESpecification:
+          SSEEnabled: True
         AttributeDefinitions:
           -
             AttributeName: "SecretID"

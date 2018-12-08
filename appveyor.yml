@@ -2,7 +2,7 @@ environment:
   nodejs_version: "6"
   AWS_ACCESS_KEY_ID:
     secure: LkRtWnDBlOLG2njX4yN862dy5pxCW/KmGemd3dtI0pY=
-  AWS_SECRET_ACCESS_KEY: 
+  AWS_SECRET_ACCESS_KEY:
     secure: Nv2ZorbpQ5GUnxB1thyvzWv7rv9XtPOLY98du5A9Zd/+CC9SF9yhcGVhBsxGjdtE
 before_build:
   - ps: Install-Product node $env:nodejs_version
@@ -10,6 +10,7 @@ before_build:
   - ps: Install-Module -Name psake
   - ps: Install-Module -Name pester
   - cmd: npm install serverless -g
+  - cmd: npm install serverless-s3-sync -g
 build_script:
   - ps: Set-AWSCredentials -AccessKey $env:AWS_ACCESS_KEY_ID -SecretKey $env:AWS_SECRET_ACCESS_KEY;Invoke-PSake;$host.SetShouldExit([int]!$psake.build_success);
 on_finish:

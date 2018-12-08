@@ -1,7 +1,5 @@
-stage: dev1
-public_bucket_name: ephemera-public-${self:custom.config.stage}-local
-client:
-    public_bucket_name: ephemera-public-${self:custom.config.stage}-local
-dynamodb_table_name: ephemera-${self:custom.config.stage}-local
-region: us-west-2
+stage: dev
+public_bucket_name: ephemera-public-sammartin-${self:custom.config.stage}
+dynamodb_table_name: ephemera-${self:custom.config.stage}
+region: eu-west-2
 max_secret_age_hours: "24"
