@@ -1,57 +1,58 @@
 console.log('loading event');
 var AWS = require('aws-sdk');
-var YAML = require("yamljs");
-var config = YAML.load('config.yml');
 AWS.config.update({
-  region: config.region,
-  endpoint: "https://dynamodb."+config.region+".amazonaws.com"
+  region: process.env.REGION,
+  endpoint: "https://dynamodb."+process.env.REGION+".amazonaws.com"
 });
 var docClient = new AWS.DynamoDB.DocumentClient();
 
-exports.handler = function (event, context, callback) {  
-  console.log('Loaded handler');
+exports.handler = function (event, context, callback) {
+  var secretKey = event.queryStringParameters.key
 
-  
   var params = {
-    TableName: config.dynamodb_table_name,
+    TableName: process.env.DYNAMODB_TABLE_NAME,
     Key: {
-        SecretID: event.query.key
+        SecretID: secretKey
     }
   };
 
   // Save the text to DynamoDB
   docClient.get(params, function(err, data) {
       if (err) {
-        return callback(null, {
-          Error: "Unable to get item. Error JSON:" + JSON.stringify(err, null, 2)
-        });
-
-      } 
+        returnResponse({message:"Unable to get item. Error JSON:" + JSON.stringify(err, null, 2)}, callback)
+        return
+      }
 
       if(!Object.keys(data).length){
-        return callback(null, {
-          ErrorMessage: "Secret not found"
-        });
-
+        returnResponse({message:"Secret not found"}, callback)
+        return
       }
-      console.log("Successfully got " + event.query.key + " from " + config.dynamodb_table_name + ". deleting...");
+      console.log("Successfully got " + secretKey + " from " + process.env.DYNAMODB_TABLE_NAME + ". deleting...");
       var params = {
-          TableName: config.dynamodb_table_name,
+          TableName: process.env.DYNAMODB_TABLE_NAME,
           Key: {
-            SecretID: event.query.key
+            SecretID: secretKey
           }
       };
 
       docClient.delete(params, function(err, data) {
         if (err) {
             console.error("Unable to delete item. Error JSON:", JSON.stringify(err, null, 2));
-        } 
+        }
       })
-      console.log(JSON.stringify(data))
-      return  callback(null, {
-        body: data.Item.SecretText
-      });
-      
-      
+      returnResponse({secretText: data.Item.SecretText}, callback)
+
+
+  });
+}
+
+var returnResponse = function(body, callback){
+  callback(null, {
+    headers: {
+      "Access-Control-Allow-Origin" : "*"
+    },
+    statusCode: 200,
+    isBase64Encoded: false,
+    body: JSON.stringify(body)
   });
 }

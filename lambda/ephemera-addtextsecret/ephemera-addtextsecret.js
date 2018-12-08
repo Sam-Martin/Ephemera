@@ -1,26 +1,24 @@
 console.log('Loading event');
 var AWS = require('aws-sdk');
-var YAML = require("yamljs");
 var s3functions = require('../common/ephemera-s3functions.js');
-var config = YAML.load('config.yml');
 AWS.config.update({
-  region: config.region,
-  endpoint: "https://dynamodb."+config.region+".amazonaws.com"
+  region: process.env.REGION,
+  endpoint: "https://dynamodb."+process.env.REGION+".amazonaws.com"
 });
 var docClient = new AWS.DynamoDB.DocumentClient();
 
 
 exports.handler = function (event, context,callback) {
   console.log('Loaded handler');
-  
+
   // Generate a UUID for a key
   var bucketKey = s3functions.generateUUID();
-  
+  console.log(event)
   var params = {
-    TableName: config.dynamodb_table_name,
+    TableName: process.env.DYNAMODB_TABLE_NAME,
     Item: {
         SecretID: bucketKey,
-        SecretText: event.body.secretText,
+        SecretText: JSON.parse(event.body).secretText,
         Uploaded: new Date().getTime()
     }
   };
@@ -29,13 +27,23 @@ exports.handler = function (event, context,callback) {
   docClient.put(params, function(err, data) {
       if (err) {
         return callback(null, {
-          Error: "Unable to add item. Error JSON:" + JSON.stringify(err, null, 2)
+          headers: {
+            "Access-Control-Allow-Origin" : "*"
+          },
+          statusCode: 500,
+          isBase64Encoded: false,
+          body: JSON.stringify({message: "Failed to insert record to database"})
         });
 
       } else {
-            console.log("Successfully put " + bucketKey + " into " + config.dynammodb_table_name);
-            return callback(null, {
-              key: bucketKey
+            console.log("Successfully put " + bucketKey + " into " + process.env.DYNAMODB_TABLE_NAME);
+            callback(null, {
+              headers: {
+                "Access-Control-Allow-Origin" : "*"
+              },
+              statusCode: 200,
+              isBase64Encoded: false,
+              body: JSON.stringify({key: bucketKey})
             });
       }
   });

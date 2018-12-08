@@ -17,12 +17,20 @@ plugin: serverless-client-s3
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
 # frameworkVersion: "=X.X.X"
-custom: ${file(config.yml)}
+custom:
+  s3Sync:
+    - bucketName: ${self:custom.config.public_bucket_name}
+      localDir: ../frontend
+      acl: public-read
+  config: ${file(config.yml)}
 provider:
   name: aws
   runtime: nodejs4.3
-  stage: dev
-  region: ${self:custom.region}
+  stage: ${self:custom.config.stage}
+  region: ${self:custom.config.region}
+  environment:
+    REGION: !Ref AWS::Region
+    DYNAMODB_TABLE_NAME: ${self:custom.config.dynamodb_table_name}
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -33,11 +41,22 @@ provider:
         - Fn::Join:
           - ""
           - - "arn:aws:dynamodb:"
-            - ${self:custom.region}
+            - ${self:custom.config.region}
             - ":"
             - Ref: 'AWS::AccountId'
             - ":table/"
-            - ${self:custom.dynamodb_table_name}
+            - ${self:custom.config.dynamodb_table_name}
+    - Effect: "Allow"
+      Action:
+          - "s3:PutObject"
+          - "s3:PutObjectAcl"
+      Resource:
+          - Fn::Join:
+            - ""
+            - - "arn:aws:s3:::"
+              - ${self:custom.config.public_bucket_name}
+              - '/*'
+
 plugins:
   - serverless-s3-sync
 
@@ -51,44 +70,66 @@ package:
     - ../lambda/**
     - config.yml
   exclude:
+    - node_modules/**
     - ../lambda/test/**
 
 functions:
-  ephemera-addtextsecret:
+  EphemeraAddTextSecret:
     handler: lambda/ephemera-addtextsecret/ephemera-addtextsecret.handler
     events:
       - http:
-          path: v2/addTextSecret
+          path: addTextSecret
           method: post
-          integration: lambda
           cors: true
-          request:
-             passThrough: WHEN_NO_MATCH
-  ephemera-getsecret:
+  EphemeraGetSecret:
     handler: lambda/ephemera-getsecret/ephemera-getsecret.handler
     events:
       - http:
-          path: v2/getSecret
+          path: getSecret
           method: get
-          integration: lambda
           cors: true
-          request:
-             passThrough: WHEN_NO_MATCH
-  ephemera-ageoffsecret:
+  EphemeraAgeOffSecret:
     handler: lambda/ephemera-ageoffsecret/ephemera-ageoffsecret.handler
     events:
       - schedule: rate(2 hours)
+  EphemeraPopulateStaticSiteConfig:
+    handler: lambda/ephemera-populatestaticsiteconfig/ephemera-populatestaticsiteconfig.handler
+    environment:
+      BUCKET_NAME: ${self:custom.config.public_bucket_name}
+      API_URL: !Join
+        - ""
+        -
+          - https://
+          - !Ref ApiGatewayRestApi
+          - ".execute-api."
+          - !Ref AWS::Region
+          - ".amazonaws.com/"
+          - ${self:custom.config.stage}
+    events:
+      - s3: PublicBucket
 
 resources:
   Resources:
-    PublicBucket:
+    S3BucketPublicBucket:
       Type: AWS::S3::Bucket
       Properties:
         AccessControl: PublicRead
         WebsiteConfiguration:
           IndexDocument: index.html
           ErrorDocument: error.html
-        BucketName:  ${self:custom.public_bucket_name}
+        BucketName:  ${self:custom.config.public_bucket_name}
+    EphemeraPopulateStaticSiteConfigPermissionPublicBucketS3:
+      Type: "AWS::Lambda::Permission"
+      Properties:
+        FunctionName:
+          "Fn::GetAtt":
+            - EphemeraPopulateStaticSiteConfigLambdaFunction
+            - Arn
+        Principal: "s3.amazonaws.com"
+        Action: "lambda:InvokeFunction"
+        SourceAccount:
+          Ref: AWS::AccountId
+        SourceArn: "arn:aws:s3:::${self:custom.config.public_bucket_name}"
     dynamoDBTable:
       Type: "AWS::DynamoDB::Table"
       Properties:
@@ -106,7 +147,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
-        TableName: ${self:custom.dynamodb_table_name}
+        TableName: ${self:custom.config.dynamodb_table_name}
         GlobalSecondaryIndexes:
         -
           IndexName: "Uploaded"
@@ -125,5 +166,5 @@ resources:
   Outputs:
     WebsiteURL:
       Value:
-        Fn::GetAtt: PublicBucket.WebsiteURL
+        Fn::GetAtt: S3BucketPublicBucket.WebsiteURL
       Description: URL for the website hosted on S3

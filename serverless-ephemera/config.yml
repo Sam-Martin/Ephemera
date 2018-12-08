@@ -1,10 +1,7 @@
-public_bucket_name: ephemera-public-dev-local
+stage: dev10
+public_bucket_name: ephemera-public-${self:custom.config.stage}-local
 client:
-    public_bucket_name: ephemera-public-dev-local
-dynamodb_table_name: ephemera-dev-local
+    public_bucket_name: ephemera-public-${self:custom.config.stage}-local
+dynamodb_table_name: ephemera-${self:custom.config.stage}-local
 region: us-west-2
 max_secret_age_days: 14
-s3Sync:
-  - bucketName: ${self:custom.public_bucket_name} # required
-    localDir: ../frontend
-    
