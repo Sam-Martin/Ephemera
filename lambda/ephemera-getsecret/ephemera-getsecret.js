@@ -8,14 +8,14 @@ var docClient = new AWS.DynamoDB.DocumentClient();
 var secretValue, secretKey
 
 exports.handler = function (event, context, callback) {
-  var secretKey = event.queryStringParameters.key
+  secretKey = event.queryStringParameters.key
 
   getSecret(secretKey).catch( err => {
-      returnResponse({message:"Unable to get item. Error JSON:" + JSON.stringify(err, null, 2)}, callback)
+      returnResponse({message:"Unable to get item. Error: " + JSON.stringify(err, null, 2)}, callback)
   }).then(decrypt).catch(err => {
     returnResponse({message: "Failed decrypting secret: "+err}, callback);
   }).then(deleteSecret).catch( err => {
-      console.error("Unable to delete item. Error JSON:", JSON.stringify(err, null, 2));
+      console.error("Unable to delete item. Error: ", JSON.stringify(err, null, 2));
   }).then( data =>{
     returnResponse({secretText: secretValue}, callback);
   })

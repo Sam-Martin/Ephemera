@@ -50,7 +50,11 @@ var populateDom = function() {
     // Upload a string
     $('#text-form').submit(function(ev) {
         ev.preventDefault();
+        if($('#secret-text').val().length == 0){
+          return
+        }
         $('#secret-text').prop('disabled', true);
+        $('#text-form  > :submit').prop('disabled', true).val('Please Wait...');
         getConfig(function(config) {
           var post_addr = config['apiUrl'] + '/addTextSecret'
           console.log(post_addr)
@@ -65,6 +69,7 @@ var populateDom = function() {
 
             }).done(function(result) {
                 $('#secret-text').prop('disabled', false);
+                $('#text-form > :submit').prop('disabled', false).val('Submit');
                 if (result.ErrorMessage) {
                     alert(result.ErrorMessage);
                 } else {
