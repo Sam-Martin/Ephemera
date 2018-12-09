@@ -109,7 +109,11 @@ functions:
           - ".amazonaws.com/"
           - ${self:custom.config.stage}
     events:
-      - s3: PublicBucket
+      - s3:
+          bucket: PublicBucket
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: index.html
 
 resources:
   Resources:
