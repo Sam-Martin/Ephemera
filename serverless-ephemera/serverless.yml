@@ -31,6 +31,7 @@ provider:
   environment:
     REGION: !Ref AWS::Region
     DYNAMODB_TABLE_NAME: ${self:custom.config.dynamodb_table_name}
+    KMS_KEY_ID: !Ref LambdaEncryptionKey
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -152,7 +153,44 @@ resources:
             KeyType: "HASH"
         TableName: ${self:custom.config.dynamodb_table_name}
         BillingMode: PAY_PER_REQUEST
-
+    LambdaEncryptionKey:
+      Type: AWS::KMS::Key
+      Properties:
+        Description: "Ephemera ${self:custom.config.stage} key"
+        KeyPolicy:
+          Version: "2012-10-17"
+          Id: "key-default"
+          Statement:
+            -
+              Sid: "Allow use of the key"
+              Effect: "Allow"
+              Principal:
+                AWS: !GetAtt [IamRoleLambdaExecution, Arn]
+              Action:
+                - "kms:Encrypt"
+                - "kms:Decrypt"
+                - "kms:ReEncrypt*"
+                - "kms:GenerateDataKey*"
+              Resource: "*"
+            -
+              Sid: "Allow administration of the key"
+              Effect: "Allow"
+              Principal:
+                AWS: '*'
+              Action:
+                - "kms:Create*"
+                - "kms:Describe*"
+                - "kms:Enable*"
+                - "kms:List*"
+                - "kms:Put*"
+                - "kms:Update*"
+                - "kms:Revoke*"
+                - "kms:Disable*"
+                - "kms:Get*"
+                - "kms:Delete*"
+                - "kms:ScheduleKeyDeletion"
+                - "kms:CancelKeyDeletion"
+              Resource: "*"
   Outputs:
     WebsiteURL:
       Value:

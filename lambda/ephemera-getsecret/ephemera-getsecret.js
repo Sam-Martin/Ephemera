@@ -27,20 +27,25 @@ exports.handler = function (event, context, callback) {
         returnResponse({message:"Secret not found"}, callback)
         return
       }
-      console.log("Successfully got " + secretKey + " from " + process.env.DYNAMODB_TABLE_NAME + ". deleting...");
-      var params = {
-          TableName: process.env.DYNAMODB_TABLE_NAME,
-          Key: {
-            SecretID: secretKey
-          }
-      };
+      console.log("Successfully got " + secretKey + " from " + process.env.DYNAMODB_TABLE_NAME + ". decrypting...");
+      decrypt(new Buffer(data.Item.SecretText,'utf-8')).then(plaintext => {
+        console.log("Successfully decrypted secret, deleting...")
+        var params = {
+            TableName: process.env.DYNAMODB_TABLE_NAME,
+            Key: {
+              SecretID: secretKey
+            }
+        };
 
-      docClient.delete(params, function(err, data) {
-        if (err) {
-            console.error("Unable to delete item. Error JSON:", JSON.stringify(err, null, 2));
-        }
+        docClient.delete(params, function(err, data) {
+          if (err) {
+              console.error("Unable to delete item. Error JSON:", JSON.stringify(err, null, 2));
+          }
+        });
+        returnResponse({secretText: plaintext.toString('utf-8')}, callback);
+      }).catch(err => {
+        returnResponse({message: "Failed decrypting secret: "+err}, callback);
       })
-      returnResponse({secretText: data.Item.SecretText}, callback)
 
 
   });
@@ -55,4 +60,24 @@ var returnResponse = function(body, callback){
     isBase64Encoded: false,
     body: JSON.stringify(body)
   });
+}
+
+function decrypt(buffer) {
+  const kms = new AWS.KMS({
+      region: process.env.REGION,
+      endpoint: "https://kms."+process.env.REGION+".amazonaws.com"
+  });
+    return new Promise((resolve, reject) => {
+        const params = {
+            CiphertextBlob: buffer
+        };
+        kms.decrypt(params, (err, data) => {
+            if (err) {
+                console.log(err);
+                reject(err);
+            } else {
+                resolve(data.Plaintext);
+            }
+        });
+    });
 }
