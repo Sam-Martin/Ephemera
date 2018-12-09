@@ -5,10 +5,47 @@ AWS.config.update({
   endpoint: "https://dynamodb."+process.env.REGION+".amazonaws.com"
 });
 var docClient = new AWS.DynamoDB.DocumentClient();
+var secretValue, secretKey
 
 exports.handler = function (event, context, callback) {
   var secretKey = event.queryStringParameters.key
 
+  getSecret(secretKey).catch( err => {
+      returnResponse({message:"Unable to get item. Error JSON:" + JSON.stringify(err, null, 2)}, callback)
+  }).then(decrypt).catch(err => {
+    returnResponse({message: "Failed decrypting secret: "+err}, callback);
+  }).then(deleteSecret).catch( err => {
+      console.error("Unable to delete item. Error JSON:", JSON.stringify(err, null, 2));
+  }).then( data =>{
+    returnResponse({secretText: secretValue}, callback);
+  })
+
+}
+
+function deleteSecret(){
+
+  console.log("Successfully decrypted secret, deleting...")
+  var params = {
+      TableName: process.env.DYNAMODB_TABLE_NAME,
+      Key: {
+        SecretID: secretKey
+      }
+  };
+  return new Promise((resolve, reject) => {
+    docClient.delete(params, function(err, data) {
+      if (err) {
+          reject(err)
+      }else{
+        resolve(data)
+      }
+    });
+
+  })
+
+
+}
+
+function getSecret(secretKey){
   var params = {
     TableName: process.env.DYNAMODB_TABLE_NAME,
     Key: {
@@ -16,39 +53,19 @@ exports.handler = function (event, context, callback) {
     }
   };
 
-  // Save the text to DynamoDB
-  docClient.get(params, function(err, data) {
-      if (err) {
-        returnResponse({message:"Unable to get item. Error JSON:" + JSON.stringify(err, null, 2)}, callback)
-        return
-      }
-
-      if(!Object.keys(data).length){
-        returnResponse({message:"Secret not found"}, callback)
-        return
-      }
-      console.log("Successfully got " + secretKey + " from " + process.env.DYNAMODB_TABLE_NAME + ". decrypting...");
-      decrypt(new Buffer(data.Item.SecretText,'utf-8')).then(plaintext => {
-        console.log("Successfully decrypted secret, deleting...")
-        var params = {
-            TableName: process.env.DYNAMODB_TABLE_NAME,
-            Key: {
-              SecretID: secretKey
-            }
-        };
-
-        docClient.delete(params, function(err, data) {
-          if (err) {
-              console.error("Unable to delete item. Error JSON:", JSON.stringify(err, null, 2));
-          }
-        });
-        returnResponse({secretText: plaintext.toString('utf-8')}, callback);
-      }).catch(err => {
-        returnResponse({message: "Failed decrypting secret: "+err}, callback);
-      })
-
-
-  });
+  return new Promise((resolve, reject) => {
+    // Save the text to DynamoDB
+    docClient.get(params, function(err, data) {
+        if (err) {
+          reject(err)
+        }else if(!Object.keys(data).length){
+          reject("Secret not found")
+        }else{
+          console.log("Successfully got " + secretKey + " from " + process.env.DYNAMODB_TABLE_NAME + ". decrypting...");
+          resolve(new Buffer(data.Item.SecretText,'utf-8'))
+        }
+    });
+  })
 }
 
 var returnResponse = function(body, callback){
@@ -76,7 +93,8 @@ function decrypt(buffer) {
                 console.log(err);
                 reject(err);
             } else {
-                resolve(data.Plaintext);
+                secretValue = data.Plaintext.toString('utf-8')
+                resolve(secretValue);
             }
         });
     });
