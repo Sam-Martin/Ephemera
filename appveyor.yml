@@ -10,6 +10,6 @@ before_build:
   - ps: Install-Module -Name psake
   - ps: Install-Module -Name pester
   - cmd: npm install serverless -g
-  - cmd: cd serverless-ephemera && npm install serverless-s3-sync --save
+  - cmd: npm install serverless-s3-sync --save
 build_script:
   - ps: Set-AWSCredentials -AccessKey $env:AWS_ACCESS_KEY_ID -SecretKey $env:AWS_SECRET_ACCESS_KEY;Invoke-PSake;$host.SetShouldExit([int]!$psake.build_success);

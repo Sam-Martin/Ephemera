@@ -27,10 +27,7 @@ task prerequisites {
 }
 
 task deploy-serverless {
-
-    Push-Location serverless-ephemera
     serverless deploy --stage $stage
-    Pop-Location
 }
 
 task test {
@@ -46,17 +43,4 @@ task test {
         $testResults | Format-List
         Write-Error -Message 'One or more Pester tests failed. Build cannot continue!'
     }
-}
-
-task destroy {
-    $ConfigFile = Get-Content 'serverless-ephemera\config.yml' | Out-String
-    $Config = ConvertFrom-Yaml -Yaml $ConfigFile
-
-    while(Get-S3Object -BucketName $config.public_bucket_name | Remove-S3Object -Force -region $config.region -BucketName $config.public_bucket_name){
-       Write-Host "Deleting objects from public s3 bucket..."
-    }
-
-    Push-Location serverless-ephemera
-    serverless remove --stage $stage
-    Pop-Location
 }

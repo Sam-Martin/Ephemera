@@ -1,6 +1,5 @@
 console.log('Loading event');
 var AWS = require('aws-sdk');
-var s3functions = require('../common/ephemera-s3functions.js');
 AWS.config.update({
   region: process.env.REGION,
   endpoint: "https://dynamodb."+process.env.REGION+".amazonaws.com"
@@ -9,12 +8,9 @@ var docClient = new AWS.DynamoDB.DocumentClient();
 
 
 exports.handler = function (event, context,callback) {
-
   // Generate a UUID for a key
-  var bucketKey = s3functions.generateUUID();
+  var bucketKey = generateUUID();
   encrypt(new Buffer(JSON.parse(event.body).secretText,'utf-8')).then(base64EncryptedString => {
-    console.log(base64EncryptedString)
-    console.log('hello')
     var params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Item: {
@@ -73,4 +69,15 @@ function encrypt(buffer) {
             }
         });
     });
+}
+
+// Stolen from http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+var generateUUID = function () {
+  var d = new Date().getTime();
+  var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = (d + Math.random() * 16) % 16 | 0;
+    d = Math.floor(d / 16);
+    return (c == 'x' ? r : r & 3 | 8).toString(16);
+  });
+  return uuid;
 }

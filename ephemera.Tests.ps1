@@ -3,9 +3,7 @@ if(!$stage){
 }
 
 # Get endpoint URL
-Push-Location serverless-ephemera
 $ServerlessInfo = &"serverless" "info" "--stage" $stage | Out-String
-Pop-Location
 
 $ConfigFile = Get-Content 'serverless-ephemera\config.yml' | Out-String
 $Config = ConvertFrom-Yaml -Yaml $ConfigFile

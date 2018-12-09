@@ -12,7 +12,9 @@
 # Happy Coding!
 
 service: serverless-ephemera-local
-plugin: serverless-client-s3
+plugins:
+  - serverless-s3-sync
+
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
@@ -20,7 +22,7 @@ plugin: serverless-client-s3
 custom:
   s3Sync:
     - bucketName: ${self:custom.config.public_bucket_name}
-      localDir: ../frontend
+      localDir: frontend
       acl: public-read
   config: ${file(config.yml)}
 provider:
@@ -59,9 +61,6 @@ provider:
               - ${self:custom.config.public_bucket_name}
               - '/*'
 
-plugins:
-  - serverless-s3-sync
-
 # you can define service wide environment variables here
 #  environment:
 #    variable1: value1
@@ -69,11 +68,10 @@ plugins:
 # you can add packaging information here
 package:
   include:
-    - ../lambda/**
+    - lambda/**
     - config.yml
   exclude:
     - node_modules/**
-    - ../lambda/test/**
 
 functions:
   EphemeraAddTextSecret:
@@ -110,6 +108,9 @@ functions:
           - ".amazonaws.com/"
           - ${self:custom.config.stage}
     events:
+      - s3:
+          bucket: PublicBucket
+          event: s3:ObjectRemoved:*
       - s3:
           bucket: PublicBucket
           event: s3:ObjectCreated:*
