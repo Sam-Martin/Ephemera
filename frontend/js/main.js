@@ -50,6 +50,7 @@ var populateDom = function() {
     // Upload a string
     $('#text-form').submit(function(ev) {
         ev.preventDefault();
+        $('#secret-text').prop('disabled', true);
         getConfig(function(config) {
           var post_addr = config['apiUrl'] + '/addTextSecret'
           console.log(post_addr)
@@ -63,6 +64,7 @@ var populateDom = function() {
                 contentType: "application/json"
 
             }).done(function(result) {
+                $('#secret-text').prop('disabled', false);
                 if (result.ErrorMessage) {
                     alert(result.ErrorMessage);
                 } else {
