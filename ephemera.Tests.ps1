@@ -5,7 +5,7 @@ if(!$stage){
 # Get endpoint URL
 $ServerlessInfo = &"serverless" "info" "--stage" $stage | Out-String
 
-$ConfigFile = Get-Content 'serverless-ephemera\config.yml' | Out-String
+$ConfigFile = Get-Content 'config.yml' | Out-String
 $Config = ConvertFrom-Yaml -Yaml $ConfigFile
 $global:addTextSecret = ($ServerlessInfo | select-string 'POST - (https://.*)').Matches[0].Groups[1].Value
 $global:getTextSecret = ($ServerlessInfo | select-string 'GET - (https://.*)').Matches[0].Groups[1].Value
