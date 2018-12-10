@@ -20,7 +20,7 @@
 	margin-top: 2em;
 }
 
-#secretUrlOutput, #copySecretOutput, #secretDisplay{
+#secretUrlOutput, #copySecretOutput, #secretDisplay, #errorRow{
 	display:none;
 }
 

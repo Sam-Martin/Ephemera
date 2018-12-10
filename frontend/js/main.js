@@ -63,6 +63,7 @@ function auto_grow(element) {
 
 var uploadSecret = function(ev) {
     ev.preventDefault();
+    $('#errorRow').hide();
     if ($('#secretText').val().length == 0) {
         return
     }
@@ -80,13 +81,19 @@ var uploadSecret = function(ev) {
         }).done(function(result) {
             $('#secretText').prop('disabled', false);
             $('#textForm > :submit').prop('disabled', false).val('Submit');
-            if (result.ErrorMessage) {
-                alert(result.ErrorMessage);
+            if (result.message) {
+                showError(result.message);
             } else {
                 populateSecretURL(window.location.origin + '?key=' + result.key);
             }
         });
     });
+}
+
+function showError(message){
+  $('#errorMessage').text(message).prepend($('<strong>').text('Error: '));
+  $('#textForm > :submit').prop('disabled', false).val('Submit');
+  $('#errorRow').show();
 }
 
 var getSecret = function() {
@@ -101,10 +108,7 @@ var getSecret = function() {
         }, function(result) {
             $('#title > div >  h1').text('Secret');
             if (result.message) {
-                $('#secretOutput').replaceWith(
-                  $('<div class="alert alert-danger" role="alert"/>')
-                    .text(result.message).prepend($('<strong>').text('Error: '))
-                );
+              showError(result.message)
             } else {
                 $('#secretOutput').text(result.secretText);
                 auto_grow(document.getElementById('secretOutput'))

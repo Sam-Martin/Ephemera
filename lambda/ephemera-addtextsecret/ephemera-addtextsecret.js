@@ -15,13 +15,13 @@ exports.handler = function(event, context, callback) {
             headers: {
                 "Access-Control-Allow-Origin": "*"
             },
-            statusCode: 500,
+            statusCode: 200,
             isBase64Encoded: false,
             body: JSON.stringify({
-                message: "Failed to insert record to database"
+                message: "Failed to insert record to database: " + err.message
             })
         });
-    }).then(returnSecret(callback))
+    }).then(data => {console.log(JSON.stringify(data));returnSecret(callback)})
 };
 
 function returnSecret(callback) {

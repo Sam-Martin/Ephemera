@@ -1,10 +1,11 @@
+<!DOCTYPE html>
 <html>
 	<head>
 		<title>Ephemera</title>
 		<!-- Latest jQuery -->
 		<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
 		<!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 		<!-- CSS specific to this page -->
 		<link rel="stylesheet" href="css/ephemera.css">
 
@@ -23,7 +24,6 @@
 		</nav>
 		<div class="jumbotron" id="pageSubtitle">
 			<div class="container text-center">
-
 				<h1>Ephemera</h1>
 				<h2>Secret Transfer</h2>
 				<p>Enter a text secret and you will be provided with a one-time use URL to give to the intended secret recipient.</p>
@@ -33,6 +33,11 @@
 			<div class="row" id="title">
 				<div class="col-md-12">
 					<h1>Text Entry</h1>
+				</div>
+			</div>
+			<div class="row" id="errorRow">
+				<div class="col-md-12">
+					<div class="alert alert-danger" role="alert" id="errorMessage"></div>
 				</div>
 			</div>
 			<div class="row" id="secretInput">
@@ -64,5 +69,4 @@
 				</div>
 			</div>
 		</div>
-	</body>
-</head>
+	</html>
