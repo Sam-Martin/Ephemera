@@ -1,32 +1,93 @@
 console.log('Loading event');
-var aws = require('aws-sdk');
-var s3 = new aws.S3();
-var YAML = require("yamljs");
-var s3functions = require('../common/ephemera-s3functions.js');
-var config = YAML.load('config.yml');
-exports.handler = function (event, context,callback) {
-  console.log('Loaded handler');
-  // Generate a UUID for a key
-  var bucketKey = s3functions.generateUUID();
-  // Upload the object to s3
-  s3.putObject({
-    Bucket: config.private_bucket_name,
-    Key: bucketKey,
-    ACL: config.s3ACL,
-    Body: event.body.secretText,
-    ContentDisposition: 'inline',
-    ContentType: 'text/plain'
-  }, function (err, data) {
-    if (err) {
-      callback(new Error('Error adding object to bucket ' + config.private_bucket_name + ' - ' + JSON.stringify(err)));
-      return;
-    }
-    console.log("Successfully put " + bucketKey + " into " + config.private_bucket_name);
-    callback(null, {
-      key: bucketKey,
-      bucketName: config.private_bucket_name,
-      bucketRegion: config.region,
-      objectURL: 'https://s3-' + config.region + '.amazonaws.com/' + config.private_bucket_name + '/' + bucketKey
-    });
-  });
+var AWS = require('aws-sdk');
+AWS.config.update({
+    region: process.env.REGION,
+    endpoint: "https://dynamodb." + process.env.REGION + ".amazonaws.com"
+});
+var docClient = new AWS.DynamoDB.DocumentClient();
+var bucketKey
+
+exports.handler = function(event, context, callback) {
+    // Generate a UUID for a key
+    bucketKey = generateUUID();
+    encrypt(new Buffer(JSON.parse(event.body).secretText, 'utf-8')).then(saveSecret).catch(err => {
+        return callback(null, {
+            headers: {
+                "Access-Control-Allow-Origin": "*"
+            },
+            statusCode: 500,
+            isBase64Encoded: false,
+            body: JSON.stringify({
+                message: "Failed to insert record to database"
+            })
+        });
+    }).then(returnSecret(callback))
 };
+
+function returnSecret(callback) {
+    console.log("Successfully put " + bucketKey + " into " + process.env.DYNAMODB_TABLE_NAME);
+    callback(null, {
+        headers: {
+            "Access-Control-Allow-Origin": "*"
+        },
+        statusCode: 200,
+        isBase64Encoded: false,
+        body: JSON.stringify({
+            key: bucketKey
+        })
+    });
+}
+
+function saveSecret(base64EncryptedString) {
+    var params = {
+        TableName: process.env.DYNAMODB_TABLE_NAME,
+        Item: {
+            SecretID: bucketKey,
+            SecretText: base64EncryptedString,
+            Uploaded: new Date().getTime()
+        }
+    };
+    return new Promise((resolve, reject) => {
+        // Save the text to DynamoDB
+        docClient.put(params, function(err, data) {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(data)
+            }
+        })
+    })
+}
+
+function encrypt(buffer) {
+    const kms = new AWS.KMS({
+        region: process.env.REGION,
+        endpoint: "https://kms." + process.env.REGION + ".amazonaws.com"
+    });
+    return new Promise((resolve, reject) => {
+        const params = {
+            KeyId: process.env.KMS_KEY_ID,
+            Plaintext: buffer
+        };
+
+        kms.encrypt(params, (err, data) => {
+            if (err) {
+                console.log(err);
+                reject(err);
+            } else {
+                resolve(data.CiphertextBlob);
+            }
+        });
+    });
+}
+
+// Stolen from http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
+var generateUUID = function() {
+    var d = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c == 'x' ? r : r & 3 | 8).toString(16);
+    });
+    return uuid;
+}

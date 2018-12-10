@@ -1,0 +1,199 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+service: serverless-ephemera-local
+plugins:
+  - serverless-s3-sync
+
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+custom:
+  s3Sync:
+    - bucketName: ${self:custom.config.public_bucket_name}
+      localDir: frontend
+      acl: public-read
+  config: ${file(config.yml)}
+provider:
+  name: aws
+  runtime: nodejs4.3
+  stage: ${self:custom.config.stage}
+  region: ${self:custom.config.region}
+  environment:
+    REGION: !Ref AWS::Region
+    DYNAMODB_TABLE_NAME: ${self:custom.config.dynamodb_table_name}
+    KMS_KEY_ID: !Ref LambdaEncryptionKey
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:GetItem"
+        - "dynamodb:PutItem"
+        - "dynamodb:Scan"
+        - "dynamodb:DeleteItem"
+      Resource:
+        - Fn::Join:
+          - ""
+          - - "arn:aws:dynamodb:"
+            - ${self:custom.config.region}
+            - ":"
+            - Ref: 'AWS::AccountId'
+            - ":table/"
+            - ${self:custom.config.dynamodb_table_name}
+    - Effect: "Allow"
+      Action:
+          - "s3:PutObject"
+          - "s3:PutObjectAcl"
+      Resource:
+          - Fn::Join:
+            - ""
+            - - "arn:aws:s3:::"
+              - ${self:custom.config.public_bucket_name}
+              - '/*'
+
+# you can define service wide environment variables here
+#  environment:
+#    variable1: value1
+
+# you can add packaging information here
+package:
+  include:
+    - lambda/**
+    - config.yml
+  exclude:
+    - node_modules/**
+
+functions:
+  EphemeraAddTextSecret:
+    handler: lambda/ephemera-addtextsecret/ephemera-addtextsecret.handler
+    events:
+      - http:
+          path: addTextSecret
+          method: post
+          cors: true
+  EphemeraGetSecret:
+    handler: lambda/ephemera-getsecret/ephemera-getsecret.handler
+    events:
+      - http:
+          path: getSecret
+          method: get
+          cors: true
+  EphemeraAgeOffSecret:
+    handler: lambda/ephemera-ageoffsecret/ephemera-ageoffsecret.handler
+    environment:
+      MAX_SECRET_AGE_HOURS: ${self:custom.config.max_secret_age_hours}
+    events:
+      - schedule: rate(2 hours)
+  EphemeraPopulateStaticSiteConfig:
+    handler: lambda/ephemera-populatestaticsiteconfig/ephemera-populatestaticsiteconfig.handler
+    environment:
+      BUCKET_NAME: ${self:custom.config.public_bucket_name}
+      API_URL: !Join
+        - ""
+        -
+          - https://
+          - !Ref ApiGatewayRestApi
+          - ".execute-api."
+          - !Ref AWS::Region
+          - ".amazonaws.com/"
+          - ${self:custom.config.stage}
+    events:
+      - s3:
+          bucket: PublicBucket
+          event: s3:ObjectRemoved:*
+      - s3:
+          bucket: PublicBucket
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: index.html
+
+resources:
+  Resources:
+    S3BucketPublicBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        AccessControl: PublicRead
+        WebsiteConfiguration:
+          IndexDocument: index.html
+          ErrorDocument: error.html
+        BucketName:  ${self:custom.config.public_bucket_name}
+    EphemeraPopulateStaticSiteConfigPermissionPublicBucketS3:
+      Type: "AWS::Lambda::Permission"
+      Properties:
+        FunctionName:
+          "Fn::GetAtt":
+            - EphemeraPopulateStaticSiteConfigLambdaFunction
+            - Arn
+        Principal: "s3.amazonaws.com"
+        Action: "lambda:InvokeFunction"
+        SourceAccount:
+          Ref: AWS::AccountId
+        SourceArn: "arn:aws:s3:::${self:custom.config.public_bucket_name}"
+    dynamoDBTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        SSESpecification:
+          SSEEnabled: True
+        AttributeDefinitions:
+          -
+            AttributeName: "SecretID"
+            AttributeType: "S"
+        KeySchema:
+          -
+            AttributeName: "SecretID"
+            KeyType: "HASH"
+        TableName: ${self:custom.config.dynamodb_table_name}
+        BillingMode: PAY_PER_REQUEST
+    LambdaEncryptionKey:
+      Type: AWS::KMS::Key
+      Properties:
+        Description: "Ephemera ${self:custom.config.stage} key"
+        KeyPolicy:
+          Version: "2012-10-17"
+          Id: "key-default"
+          Statement:
+            -
+              Sid: "Allow use of the key"
+              Effect: "Allow"
+              Principal:
+                AWS: !GetAtt [IamRoleLambdaExecution, Arn]
+              Action:
+                - "kms:Encrypt"
+                - "kms:Decrypt"
+                - "kms:ReEncrypt*"
+                - "kms:GenerateDataKey*"
+              Resource: "*"
+            -
+              Sid: "Allow administration of the key"
+              Effect: "Allow"
+              Principal:
+                AWS: '*'
+              Action:
+                - "kms:Create*"
+                - "kms:Describe*"
+                - "kms:Enable*"
+                - "kms:List*"
+                - "kms:Put*"
+                - "kms:Update*"
+                - "kms:Revoke*"
+                - "kms:Disable*"
+                - "kms:Get*"
+                - "kms:Delete*"
+                - "kms:ScheduleKeyDeletion"
+                - "kms:CancelKeyDeletion"
+              Resource: "*"
+  Outputs:
+    WebsiteURL:
+      Value:
+        Fn::GetAtt: S3BucketPublicBucket.WebsiteURL
+      Description: URL for the website hosted on S3
