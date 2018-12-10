@@ -20,10 +20,23 @@
 	margin-top: 2em;
 }
 
-#secretOutput{
+#secretUrlOutput, #copySecretOutput, #secretDisplay{
 	display:none;
+}
+
+#copySecretURL{
+	margin-top:0.5em;
+}
+
+#secretOutput{
+	width:100%;
 }
 
 input[type=file] {
 	float:left
+}
+
+#secretURL{
+		padding: 0.5em;
+		width: 100%;
 }

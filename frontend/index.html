@@ -4,9 +4,7 @@
 		<!-- Latest jQuery -->
 		<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
 		<!-- Latest compiled and minified CSS -->
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-		<!-- Bootstrap CSS -->
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 		<!-- CSS specific to this page -->
 		<link rel="stylesheet" href="css/ephemera.css">
 
@@ -32,12 +30,16 @@
 			</div>
 		</div>
 		<div class="container" id="pageBody">
-			<div class="row">
+			<div class="row" id="title">
 				<div class="col-md-12">
 					<h1>Text Entry</h1>
-					<form id="text-form">
+				</div>
+			</div>
+			<div class="row" id="secretInput">
+				<div class="col-md-12">
+					<form id="textForm">
 						<p>
-							<textarea id="secret-text" rows="4" cols="50"></textarea>
+							<textarea id="secretText" rows="4" cols="50"></textarea>
 						</p>
 						<p>
 							<input type="submit" value="Submit">
@@ -45,11 +47,22 @@
 					</form>
 				</div>
 			</div>
-			<div id="secretOutput">
-				<h1>Secret URL</h1>
-				<pre id="secretURL">...</pre>
+			<div class="row" id="secretUrlOutput">
+				<div class="col-md-10">
+					<input type="text" id="secretURL"/>
+				</div>
+				<div class="col-md-2">
+					<button id="copySecretURL">Copy</button>
+				</div>
 			</div>
-
+			<div class="row" id="secretDisplay">
+				<div class="col-md-8">
+					<textarea id="secretOutput">...</textarea>
+				</div>
+				<div class="col-md-4">
+					<button id="copySecretOutput">Copy</button>
+				</div>
+			</div>
 		</div>
 	</body>
 </head>

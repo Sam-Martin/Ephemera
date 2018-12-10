@@ -1,3 +1,5 @@
+var isiOSDevice = navigator.userAgent.match(/ipad|iphone/i);
+
 // Stolen from http://stackoverflow.com/questions/4656843/jquery-get-querystring-from-url
 // Read a page's GET URL variables and return them as an associative array.
 function getUrlVars() {
@@ -13,13 +15,13 @@ function getUrlVars() {
 }
 
 var populateSecretURL = function(secretURL) {
-    $('#secretURL').text(secretURL);
+    $('#secretURL').val(secretURL);
 
     // Clear out the secret field
-    $('#secret-text').val('');
+    $('#secretText').val('');
 
     // Slide down the output
-    $('#secretOutput').slideDown();
+    $('#secretUrlOutput').slideDown();
 };
 $(document).ready(function() {
 
@@ -29,48 +31,50 @@ $(document).ready(function() {
 var populateDom = function() {
     urlVars = getUrlVars();
     if (typeof urlVars != 'undefined' && urlVars.bucket) {
-
-        // if bucket is defined as a GET variable we've just uploaded something
         populateSecretURL(window.location.origin + '?key=' + urlVars.key);
-    } else if (typeof urlVars != 'undefined' && window.location.href.match(/getSecret.html/)) {
-
-        // if we don't have a secret key, but we're on getSecret.html, tell the user they can't do anything useful here
-        $('#secretOutput').html(`<div class="alert alert-danger" role="alert">
-          <strong>Error:</strong>
-           No secret key defined. If you\'re trying to upload a secret, you may not have access to do so.</html>
-        `);
-
-        // Slide down the output
-        $('#secretOutput').slideDown();
-
     } else if (typeof urlVars != 'undefined' && urlVars.key) {
         getSecret();
     }
+    // Enable copy to clipboard
+    $('#copySecretURL').click(function(){copyToClipboard('secretURL')})
+    $('#copySecretOutput').click(function(){copyToClipboard('secretOutput')})
+
+    if(isiOSDevice){
+      $('#copySecretURL').hide()
+    }
 
     // Upload a string
-    $('#text-form').submit(uploadSecret);
+    $('#textForm').submit(uploadSecret);
+}
+
+function copyToClipboard(id){
+  console.log(id)
+
+  var el = document.getElementById(id);
+  console.log($(el).val())
+  el.select();
+  document.execCommand('copy');
 }
 
 var uploadSecret = function(ev) {
     ev.preventDefault();
-    if ($('#secret-text').val().length == 0) {
+    if ($('#secretText').val().length == 0) {
         return
     }
-    $('#secret-text').prop('disabled', true);
-    $('#text-form  > :submit').prop('disabled', true).val('Please Wait...');
+    $('#secretText').prop('disabled', true);
+    $('#textForm  > :submit').prop('disabled', true).val('Please Wait...');
     getConfig(function(config) {
         var post_addr = config['apiUrl'] + '/addTextSecret'
-        console.log(post_addr)
         $.ajax({
             url: post_addr,
             method: 'POST',
             data: JSON.stringify({
-                'secretText': $('#secret-text').val()
+                'secretText': $('#secretText').val()
             }),
             contentType: "application/json"
         }).done(function(result) {
-            $('#secret-text').prop('disabled', false);
-            $('#text-form > :submit').prop('disabled', false).val('Submit');
+            $('#secretText').prop('disabled', false);
+            $('#textForm > :submit').prop('disabled', false).val('Submit');
             if (result.ErrorMessage) {
                 alert(result.ErrorMessage);
             } else {
@@ -81,19 +85,26 @@ var uploadSecret = function(ev) {
 }
 
 var getSecret = function() {
-    // if key is defined without bucket then we're retrieving a secret
-    var secretArea = $('#pageBody');
+    $('#secretInput').hide()
+    var secretArea = $('#secretDisplay');
     $('#pageSubtitle p').text('Displaying a secret once...');
-    secretArea.html('<h1>Loading Secret...</h1>');
+    secretArea.show();
+    $('#title > div >  h1').text('Loading Secret...');
     getConfig(function(config) {
         $.get(config.apiUrl + '/getSecret', {
             key: urlVars.key
         }, function(result) {
-            secretArea.html('<h1>Secret</h1>');
+            $('#title > div >  h1').text('Secret');
             if (result.message) {
-                secretArea.append(result.message);
+                $('#secretOutput').replaceWith(
+                  $('<div class="alert alert-danger" role="alert"/>')
+                    .text(result.message).prepend($('<strong>').text('Error: '))
+                );
             } else {
-                secretArea.append($('<pre>').text(result.secretText));
+                $('#secretOutput').text(result.secretText);
+                if(!isiOSDevice){
+                  $('#copySecretOutput').show();
+                }
             }
         }, 'json');
     });
