@@ -20,7 +20,7 @@
 	margin-top: 2em;
 }
 
-#secretUrlOutput, #copySecretOutput, #secretDisplay{
+#secretUrlOutput, #copySecretOutput, #secretDisplay, #errorRow{
 	display:none;
 }
 
@@ -39,4 +39,23 @@ input[type=file] {
 #secretURL{
 		padding: 0.5em;
 		width: 100%;
+}
+
+input[type=text]{
+  border: 0;
+}
+
+input[type=text]:focus{
+  outline: 0;
+}
+
+#secretOutput:focus{
+  outline: 0;
+}
+
+
+#secretOutput{
+		border:0;
+    resize: none;
+    overflow: hidden;
 }
