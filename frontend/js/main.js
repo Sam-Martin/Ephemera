@@ -48,34 +48,36 @@ var populateDom = function() {
     }
 
     // Upload a string
-    $('#text-form').submit(function(ev) {
-        ev.preventDefault();
-        if($('#secret-text').val().length == 0){
-          return
-        }
-        $('#secret-text').prop('disabled', true);
-        $('#text-form  > :submit').prop('disabled', true).val('Please Wait...');
-        getConfig(function(config) {
-          var post_addr = config['apiUrl'] + '/addTextSecret'
-          console.log(post_addr)
-          $.ajax(
-                {
-                url: post_addr,
-                method: 'POST',
-                data: JSON.stringify({
-                    'secretText': $('#secret-text').val()
-                }),
-                contentType: "application/json"
+    $('#text-form').submit(uploadSecret);
+}
 
-            }).done(function(result) {
-                $('#secret-text').prop('disabled', false);
-                $('#text-form > :submit').prop('disabled', false).val('Submit');
-                if (result.ErrorMessage) {
-                    alert(result.ErrorMessage);
-                } else {
-                    populateSecretURL(window.location.origin + '?key=' + result.key);
-                }
-            });
+var uploadSecret = function(ev) {
+    ev.preventDefault();
+    if($('#secret-text').val().length == 0){
+      return
+    }
+    $('#secret-text').prop('disabled', true);
+    $('#text-form  > :submit').prop('disabled', true).val('Please Wait...');
+    getConfig(function(config) {
+      var post_addr = config['apiUrl'] + '/addTextSecret'
+      console.log(post_addr)
+      $.ajax(
+            {
+            url: post_addr,
+            method: 'POST',
+            data: JSON.stringify({
+                'secretText': $('#secret-text').val()
+            }),
+            contentType: "application/json"
+
+        }).done(function(result) {
+            $('#secret-text').prop('disabled', false);
+            $('#text-form > :submit').prop('disabled', false).val('Submit');
+            if (result.ErrorMessage) {
+                alert(result.ErrorMessage);
+            } else {
+                populateSecretURL(window.location.origin + '?key=' + result.key);
+            }
         });
     });
 }
@@ -93,7 +95,7 @@ var getSecret = function() {
             if (result.message) {
                 secretArea.append(result.message);
             } else {
-                secretArea.append("<pre>" + result.secretText + "</pre>");
+                secretArea.append($('<pre>').text(result.secretText));
             }
         }, 'json');
     });
