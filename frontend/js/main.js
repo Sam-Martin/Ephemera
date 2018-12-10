@@ -53,23 +53,21 @@ var populateDom = function() {
 
 var uploadSecret = function(ev) {
     ev.preventDefault();
-    if($('#secret-text').val().length == 0){
-      return
+    if ($('#secret-text').val().length == 0) {
+        return
     }
     $('#secret-text').prop('disabled', true);
     $('#text-form  > :submit').prop('disabled', true).val('Please Wait...');
     getConfig(function(config) {
-      var post_addr = config['apiUrl'] + '/addTextSecret'
-      console.log(post_addr)
-      $.ajax(
-            {
+        var post_addr = config['apiUrl'] + '/addTextSecret'
+        console.log(post_addr)
+        $.ajax({
             url: post_addr,
             method: 'POST',
             data: JSON.stringify({
                 'secretText': $('#secret-text').val()
             }),
             contentType: "application/json"
-
         }).done(function(result) {
             $('#secret-text').prop('disabled', false);
             $('#text-form > :submit').prop('disabled', false).val('Submit');
