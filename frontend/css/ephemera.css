@@ -40,3 +40,22 @@ input[type=file] {
 		padding: 0.5em;
 		width: 100%;
 }
+
+input[type=text]{
+  border: 0;
+}
+
+input[type=text]:focus{
+  outline: 0;
+}
+
+#secretOutput:focus{
+  outline: 0;
+}
+
+
+#secretOutput{
+		border:0;
+    resize: none;
+    overflow: hidden;
+}

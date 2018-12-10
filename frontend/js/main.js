@@ -56,6 +56,11 @@ function copyToClipboard(id){
   document.execCommand('copy');
 }
 
+function auto_grow(element) {
+    element.style.height = "5px";
+    element.style.height = (element.scrollHeight)+"px";
+}
+
 var uploadSecret = function(ev) {
     ev.preventDefault();
     if ($('#secretText').val().length == 0) {
@@ -102,6 +107,7 @@ var getSecret = function() {
                 );
             } else {
                 $('#secretOutput').text(result.secretText);
+                auto_grow(document.getElementById('secretOutput'))
                 if(!isiOSDevice){
                   $('#copySecretOutput').show();
                 }
