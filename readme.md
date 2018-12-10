@@ -1,4 +1,4 @@
-# Ephemera - One time secret distribution
+# Ephemera - One Time Secret Distribution
  [![GitHub license](http://i.imgur.com/fkMVzNe.png)]() [![Build Status](https://ci.appveyor.com/api/projects/status/9cgvg2f1y0oolleg/branch/master?svg=true)](https://ci.appveyor.com/project/Sam-Martin/ephemera)  
  ![Screenshot](http://i.giphy.com/l41lHcOVaBJnKnbEs.gif)  
 This repository contains the Node.js, HTML, JavaScript, and supporting [Serverless](https://github.com/serverless/serverless) definition to upload secrets securely to DynamoDB and deliver a one-time URL back to the user.
@@ -19,14 +19,14 @@ serverless deploy
 
 ## Overview  
 Ephemera is a one-time secret transfer tool intended to help you in the transition from legacy tools which do not allow secure secret communication (e.g. via password reset URLs or key fingerprints).  
-Ephemera is intended to be simple enough to be audited by someone with a basic understanding of JavaScript and AWS to validate that it is a non-malicous method for password transfer that you can setup in your own AWS account.  
+It is intended to be simple enough to be audited by someone with a basic understanding of JavaScript and AWS to validate that it is a non-malicious method for password transfer that you can setup in your own AWS account.  
 It is not intended to be a replacement for proper user-centric secret management, but merely a transitional phase to help eradicate secrets attached to plaintext emails.  
 This project is currently functional but needs work to add unit tests etc.
 
 ## How it Works
 Ephemera uses five components
 
-1. AWS S3 for website hosting.
+1. AWS S3 for website hosting
 2. AWS Lambda for GUID creation and secret management
 3. AWS API Gateway as a front-end for Lambda allowing the JavaScript from the S3 website to add/retrieve secrets
 4. AWS DynamoDB for secret storage
@@ -37,7 +37,7 @@ The user is presented with a website that gives them the option to upload a text
 ### Uploading a Secret
 When uploading a text secret, the user submits the secret via a text box, the contents of which are submitted to the API Gateway `addTextSecret` method. This method generates a GUID and saves the secret in the private S3 bucket as with that GUID as its key. The method then returns the GUID combined with the specified websiteURL for the address of the secret return page which the user can then give to the person they wish to transmit the secret to.
 
-### Retrieving a secret
+### Retrieving a Secret
 When a user clicks on a one-time URL, the JavaScript on the page recognises that the URL contains a GUID and then calls the API Gateway `getSecret` method submitting that GUID for retrieval. The return of this method includes the secret which is displayed for the user.
 
 ## Contributing
