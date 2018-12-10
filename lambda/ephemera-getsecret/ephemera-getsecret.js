@@ -12,7 +12,7 @@ exports.handler = function(event, context, callback) {
 
     getSecret(secretKey).catch(err => {
         returnResponse({
-            message: "Unable to get item. Error: " + JSON.stringify(err, null, 2)
+            message: "Unable to get item. " + JSON.stringify(err, null, 2)
         }, callback)
     }).then(decrypt).catch(err => {
         returnResponse({
