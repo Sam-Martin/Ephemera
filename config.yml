@@ -3,3 +3,8 @@ public_bucket_name: ephemera-public-sammartin-${self:custom.config.stage}
 dynamodb_table_name: ephemera-${self:custom.config.stage}
 region: eu-west-2
 max_secret_age_hours: "24"
+
+# Provide a list of IP addresses to which Ephemera will be restricted (i.e. Your corporate office egress IP)
+# The default of 0.0.0.0/0 permits access from any host on the internet
+whitelisted_ips:
+  - 0.0.0.0/0
