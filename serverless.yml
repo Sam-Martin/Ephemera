@@ -27,9 +27,19 @@ custom:
   config: ${file(config.yml)}
 provider:
   name: aws
-  runtime: nodejs4.3
+  runtime: nodejs8.10
   stage: ${self:custom.config.stage}
   region: ${self:custom.config.region}
+  resourcePolicy:
+    - Effect: Allow
+      Principal: "*"
+      Action: execute-api:Invoke
+      Resource:
+        - execute-api:/${self:custom.config.stage}/*/addTextSecret
+        - execute-api:/${self:custom.config.stage}/*/getSecret
+      Condition:
+        IpAddress:
+          aws:SourceIp: ${self:custom.config.whitelisted_ips}
   environment:
     REGION: !Ref AWS::Region
     DYNAMODB_TABLE_NAME: ${self:custom.config.dynamodb_table_name}
@@ -121,11 +131,46 @@ resources:
     S3BucketPublicBucket:
       Type: AWS::S3::Bucket
       Properties:
-        AccessControl: PublicRead
         WebsiteConfiguration:
           IndexDocument: index.html
           ErrorDocument: error.html
+        PublicAccessBlockConfiguration:
+          RestrictPublicBuckets: true
         BucketName:  ${self:custom.config.public_bucket_name}
+    S3BucketPublicBucketPolicy: 
+      Type: AWS::S3::BucketPolicy
+      Properties: 
+        Bucket: 
+          !Ref S3BucketPublicBucket
+        PolicyDocument: 
+          Statement: 
+            - 
+              Action: 
+                - "s3:GetObject"
+              Effect: "Deny"
+              Resource: "arn:aws:s3:::${self:custom.config.public_bucket_name}/*"
+              Principal: "*"
+              Condition: 
+                NotIpAddress: 
+                  aws:SourceIp: ${self:custom.config.whitelisted_ips}
+            - 
+              Action: 
+                - "s3:GetObject"
+              Effect: "Allow"
+              Resource: "arn:aws:s3:::${self:custom.config.public_bucket_name}/*"
+              Principal: "*"
+              Condition: 
+                StringLike: 
+                  aws:Referer: 
+                    - "http://${self:custom.config.public_bucket_name}/"
+            - 
+              Action: 
+                - "s3:*"
+              Effect: "Allow"
+              Resource: "arn:aws:s3:::${self:custom.config.public_bucket_name}/*"
+              Principal:
+                AWS:
+                  - !GetAtt [IamRoleLambdaExecution, Arn]
     EphemeraPopulateStaticSiteConfigPermissionPublicBucketS3:
       Type: "AWS::Lambda::Permission"
       Properties:
