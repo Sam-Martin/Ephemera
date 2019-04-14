@@ -3,10 +3,11 @@ import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import _ from 'lodash'
 import fetch from 'node-fetch'
-
+import CopyToClipboard from 'react-copy-to-clipboard'
 import './ephemera.css';
 import githubLogo from './GitHub-Mark-Light-120px-plus.png';
 import logo from './ephemera-log-no-background.png';
+
 
 import {Container, Form, Jumbotron, Navbar, Nav, Button, Spinner, Alert} from 'react-bootstrap';
 
@@ -33,11 +34,11 @@ class Content extends React.Component {
   render(){
     if(_.isEmpty(this.props.secretId)){
       return (
-        <SecretEntry/>
+        <SecretEntry apiUrl='https://pjelxem04b.execute-api.eu-west-2.amazonaws.com/prod/'/>
       )
     }
     return (
-        <SecretDisplay />
+        <SecretDisplay apiUrl='https://pjelxem04b.execute-api.eu-west-2.amazonaws.com/prod/'/>
     )
   }
 }
@@ -47,7 +48,7 @@ function SecretDisplay(props){
     <Container>
       <Form>
         <Form.Group controlId="formBasicEmail">
-          <Form.Label><h1>Secret:</h1></Form.Label>
+          <Form.Label><h1>Secret</h1></Form.Label>
         </Form.Group>
         <Form.Control as="textarea" placeholder="Loading..." className="secretOutput" />
       </Form>
@@ -69,7 +70,7 @@ class SecretEntry extends React.Component {
       loading: true,
       error: false
     }));
-    return fetch('https://pjelxem04b.execute-api.eu-west-2.amazonaws.com/prod/'+action, {
+    return fetch(this.props.apiUrl+action, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -79,10 +80,14 @@ class SecretEntry extends React.Component {
     })
     .then((response) => response.json())
     .then((responseData) => {
+      this.setState(state => ({
+        loading: false,
+        error: false
+      }))
       return responseData
     }).
     catch((error) => {
-      if (error == 'TypeError: Failed to fetch'){
+      if (error === 'TypeError: Failed to fetch'){
         error = 'Error submitting data'
       }
       this.setState(state => ({
@@ -97,7 +102,9 @@ class SecretEntry extends React.Component {
     e.preventDefault()
     this.apiPost('addTextSecret', {secretText:e.target.secretText.value})
     .then((response) => {
-      console.log(response)
+      this.setState(state => ({
+        secretId: response.key
+      }))
     })
   }
 
@@ -109,26 +116,60 @@ class SecretEntry extends React.Component {
             {this.state.errorMessage.toString()}
           </Alert>
         }
-        <Form onSubmit={this.saveSecret}>
-          <Form.Group controlId="formBasicEmail">
-            <Form.Control as="textarea" placeholder="Enter Secret" name="secretText" disabled={this.state.loading}/>
-          </Form.Group>
-          <Button type="submit" disabled={this.state.loading}>
-            {this.state.loading &&
-              <Spinner
-                as="span"
-                animation="grow"
-                size="sm"
-                role="status"
-                aria-hidden="true"
-              />
-            }
-            {this.state.loading ? ' Getting URL...' : 'Get URL'}
-          </Button>
-        </Form>
+        {!this.state.secretId &&
+          <SecretEntryForm loading={this.state.loading} saveSecretHandler={this.saveSecret} />
+        }
+        {this.state.secretId &&
+          <SecretUrlDisplay secretId={this.state.secretId}/>
+        }
       </Container>
     )
   }
+}
+
+class SecretUrlDisplay extends React.Component {
+  secretUrl(){
+    return window.location.origin + '/?secretId=' + this.props.secretId
+  }
+  render() {
+    return(
+      <div>
+        <Form.Group>
+            <Form.Label><h1>Secret URL</h1></Form.Label>
+          <Form.Control type="text" defaultValue={this.secretUrl()} name="secretUrl" />
+        </Form.Group>
+        <Form.Group>
+          <CopyToClipboard text={this.secretUrl()}>
+            <Button>Copy URL</Button>
+          </CopyToClipboard>
+          <Button variant="success" className="ml-1">Add New Secret</Button>
+        </Form.Group>
+      </div>
+    )
+  }
+}
+
+function SecretEntryForm(props){
+  return (
+    <Form onSubmit={props.saveSecretHandler}>
+      <h1>Enter Secret</h1>
+      <Form.Group controlId="formSecretText">
+        <Form.Control as="textarea" placeholder="Enter secret here" name="secretText" disabled={props.loading}/>
+      </Form.Group>
+      <Button type="submit" disabled={props.loading}>
+        {props.loading &&
+          <Spinner
+            as="span"
+            animation="grow"
+            size="sm"
+            role="status"
+            aria-hidden="true"
+          />
+        }
+        {props.loading ? ' Getting URL...' : 'Get URL'}
+      </Button>
+    </Form>
+  )
 }
 
 function SubHeader() {
