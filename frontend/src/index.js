@@ -2,14 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import _ from 'lodash'
-import fetch from 'node-fetch'
-import CopyToClipboard from 'react-copy-to-clipboard'
 import './ephemera.css';
 import githubLogo from './GitHub-Mark-Light-120px-plus.png';
 import logo from './ephemera-log-no-background.png';
 
+import {Container, Form, Jumbotron, Navbar, Nav} from 'react-bootstrap';
 
-import {Container, Form, Jumbotron, Navbar, Nav, Button, Spinner, Alert} from 'react-bootstrap';
+import SecretEntry from './components/SecretEntry'
 
 class Header extends React.Component {
   render () {
@@ -55,121 +54,6 @@ function SecretDisplay(props){
     </Container>
   )
 
-}
-
-class SecretEntry extends React.Component {
-  constructor(props){
-    super(props)
-    this.saveSecret = this.saveSecret.bind(this)
-    this.state = {
-      loading: false
-    }
-  }
-  apiPost(action, dict){
-    this.setState(state => ({
-      loading: true,
-      error: false
-    }));
-    return fetch(this.props.apiUrl+action, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(dict)
-    })
-    .then((response) => response.json())
-    .then((responseData) => {
-      this.setState(state => ({
-        loading: false,
-        error: false
-      }))
-      return responseData
-    }).
-    catch((error) => {
-      if (error === 'TypeError: Failed to fetch'){
-        error = 'Error submitting data'
-      }
-      this.setState(state => ({
-        loading: false,
-        error: true,
-        errorMessage: error
-      }))
-    })
-
-  }
-  saveSecret(e){
-    e.preventDefault()
-    this.apiPost('addTextSecret', {secretText:e.target.secretText.value})
-    .then((response) => {
-      this.setState(state => ({
-        secretId: response.key
-      }))
-    })
-  }
-
-  render() {
-    return (
-      <Container>
-        {this.state.error &&
-          <Alert variant="danger">
-            {this.state.errorMessage.toString()}
-          </Alert>
-        }
-        {!this.state.secretId &&
-          <SecretEntryForm loading={this.state.loading} saveSecretHandler={this.saveSecret} />
-        }
-        {this.state.secretId &&
-          <SecretUrlDisplay secretId={this.state.secretId}/>
-        }
-      </Container>
-    )
-  }
-}
-
-class SecretUrlDisplay extends React.Component {
-  secretUrl(){
-    return window.location.origin + '/?secretId=' + this.props.secretId
-  }
-  render() {
-    return(
-      <div>
-        <Form.Group>
-            <Form.Label><h1>Secret URL</h1></Form.Label>
-          <Form.Control type="text" defaultValue={this.secretUrl()} name="secretUrl" />
-        </Form.Group>
-        <Form.Group>
-          <CopyToClipboard text={this.secretUrl()}>
-            <Button>Copy URL</Button>
-          </CopyToClipboard>
-          <Button variant="success" className="ml-1">Add New Secret</Button>
-        </Form.Group>
-      </div>
-    )
-  }
-}
-
-function SecretEntryForm(props){
-  return (
-    <Form onSubmit={props.saveSecretHandler}>
-      <h1>Enter Secret</h1>
-      <Form.Group controlId="formSecretText">
-        <Form.Control as="textarea" placeholder="Enter secret here" name="secretText" disabled={props.loading}/>
-      </Form.Group>
-      <Button type="submit" disabled={props.loading}>
-        {props.loading &&
-          <Spinner
-            as="span"
-            animation="grow"
-            size="sm"
-            role="status"
-            aria-hidden="true"
-          />
-        }
-        {props.loading ? ' Getting URL...' : 'Get URL'}
-      </Button>
-    </Form>
-  )
 }
 
 function SubHeader() {
