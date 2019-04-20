@@ -6,8 +6,9 @@ import './ephemera.css';
 import githubLogo from './GitHub-Mark-Light-120px-plus.png';
 import logo from './ephemera-log-no-background.png';
 
-import {Container, Form, Jumbotron, Navbar, Nav} from 'react-bootstrap';
+import {Container, Jumbotron, Navbar, Nav} from 'react-bootstrap';
 
+import SecretDisplay from './components/SecretDisplay'
 import SecretEntry from './components/SecretEntry'
 
 class Header extends React.Component {
@@ -42,19 +43,6 @@ class Content extends React.Component {
   }
 }
 
-function SecretDisplay(props){
-  return (
-    <Container>
-      <Form>
-        <Form.Group controlId="formBasicEmail">
-          <Form.Label><h1>Secret</h1></Form.Label>
-        </Form.Group>
-        <Form.Control as="textarea" placeholder="Loading..." className="secretOutput" />
-      </Form>
-    </Container>
-  )
-
-}
 
 function SubHeader() {
   return (
