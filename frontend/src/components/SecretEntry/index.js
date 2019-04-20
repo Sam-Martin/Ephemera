@@ -1,14 +1,16 @@
 import React from 'react';
-import {Container, Alert} from 'react-bootstrap';
+import {Container} from 'react-bootstrap';
 import fetch from 'node-fetch'
 
 import SecretEntryForm from './SecretEntryForm'
 import SecretUrlDisplay from './SecretUrlDisplay'
+import Error from '../lib/Error'
 
 class SecretEntry extends React.Component {
   constructor(props){
     super(props)
     this.saveSecret = this.saveSecret.bind(this)
+    this.newSecret = this.newSecret.bind(this)
     this.state = {
       loading: false
     }
@@ -48,26 +50,31 @@ class SecretEntry extends React.Component {
   }
   saveSecret(e){
     e.preventDefault()
-    this.apiPost('addTextSecret', {secretText:e.target.secretText.value})
+    this.apiPost('/addTextSecret', {secretText:e.target.secretText.value})
     .then((response) => {
       this.setState(state => ({
         secretId: response.key
       }))
     })
   }
+  newSecret(){
+    this.setState({
+      error:false,
+      loading:false,
+      secretId:false
+    })
+  }
   render() {
     return (
       <Container>
         {this.state.error &&
-          <Alert variant="danger">
-            {this.state.errorMessage.toString()}
-          </Alert>
+          <Error message={this.state.errorMessage.toString()} />
         }
         {!this.state.secretId &&
           <SecretEntryForm loading={this.state.loading} saveSecretHandler={this.saveSecret} />
         }
         {this.state.secretId &&
-          <SecretUrlDisplay secretId={this.state.secretId}/>
+          <SecretUrlDisplay secretId={this.state.secretId} newSecretHandler={this.newSecret}/>
         }
       </Container>
     )
