@@ -36,10 +36,17 @@ provider:
       Action: execute-api:Invoke
       Resource:
         - execute-api:/${self:custom.config.stage}/*/addTextSecret
+      Condition:
+        IpAddress:
+          aws:SourceIp: ${self:custom.config.add_secret_whitelisted_ips}
+    - Effect: Allow
+      Principal: "*"
+      Action: execute-api:Invoke
+      Resource:
         - execute-api:/${self:custom.config.stage}/*/getSecret
       Condition:
         IpAddress:
-          aws:SourceIp: ${self:custom.config.whitelisted_ips}
+          aws:SourceIp: ${self:custom.config.get_secret_whitelisted_ips}
   environment:
     REGION: !Ref AWS::Region
     DYNAMODB_TABLE_NAME: ${self:custom.config.dynamodb_table_name}
@@ -144,15 +151,6 @@ resources:
           !Ref S3BucketPublicBucket
         PolicyDocument: 
           Statement: 
-            - 
-              Action: 
-                - "s3:GetObject"
-              Effect: "Deny"
-              Resource: "arn:aws:s3:::${self:custom.config.public_bucket_name}/*"
-              Principal: "*"
-              Condition: 
-                NotIpAddress: 
-                  aws:SourceIp: ${self:custom.config.whitelisted_ips}
             - 
               Action: 
                 - "s3:GetObject"
