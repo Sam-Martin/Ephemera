@@ -127,7 +127,19 @@ functions:
             - prefix: index.html
 
 resources:
+  Conditions:
+    HttpUi: !Equals ["${self:custom.config.use_https_ui}", false]
+    HttpsUi: !Equals ["${self:custom.config.use_https_ui}", true]
+
   Resources:
+    # Create CloudFront OAI when using HTTPS, so this can be added to the S3 Bucket Policy
+    EphemeraCloudfrontOriginAccessIdentity:
+      Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+      Condition: HttpsUi
+      Properties:
+        CloudFrontOriginAccessIdentityConfig:
+          Comment: "access-identity-${self:custom.config.public_bucket_name}.s3.amazonaws.com"
+
     S3BucketPublicBucket:
       Type: AWS::S3::Bucket
       Properties:
@@ -137,8 +149,10 @@ resources:
         PublicAccessBlockConfiguration:
           RestrictPublicBuckets: true
         BucketName:  ${self:custom.config.public_bucket_name}
-    S3BucketPublicBucketPolicy: 
+    
+    S3BucketHttpPublicBucketPolicy: 
       Type: AWS::S3::BucketPolicy
+      Condition: HttpUi
       Properties: 
         Bucket: 
           !Ref S3BucketPublicBucket
@@ -171,6 +185,58 @@ resources:
               Principal:
                 AWS:
                   - !GetAtt [IamRoleLambdaExecution, Arn]
+
+    # Create S3 Bucket Policy which permits access only from AWS Lambda and AWS CloudFront
+    S3BucketHttpsPublicBucketPolicy: 
+      Type: AWS::S3::BucketPolicy
+      Condition: HttpsUi
+      Properties: 
+        Bucket: 
+          !Ref S3BucketPublicBucket
+        PolicyDocument: 
+          Statement:
+            - 
+              Action: 
+                - "s3:GetObject"
+              Effect: "Allow"
+              Resource: "arn:aws:s3:::${self:custom.config.public_bucket_name}/*"
+              Principal:
+                AWS: !Join [" ", ["arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity", !Ref EphemeraCloudfrontOriginAccessIdentity]]
+            - 
+              Action: 
+                - "s3:*"
+              Effect: "Allow"
+              Resource: "arn:aws:s3:::${self:custom.config.public_bucket_name}/*"
+              Principal:
+                AWS:
+                  - !GetAtt [IamRoleLambdaExecution, Arn]
+    
+    # If using HTTPS UI, create a CloudFront distribution to front the S3 Bucket
+    EphemeraCloudfrontDistribution:
+      Type: AWS::CloudFront::Distribution
+      Condition: HttpsUi
+      Properties:
+        DistributionConfig:
+          Origins:
+            - DomainName: "${self:custom.config.public_bucket_name}.s3.amazonaws.com"
+              Id: "S3-${self:custom.config.public_bucket_name}"
+              S3OriginConfig:
+                OriginAccessIdentity: !Join ["/", ["origin-access-identity/cloudfront", !Ref EphemeraCloudfrontOriginAccessIdentity]]
+          Enabled: true
+          DefaultRootObject: index.html
+          Aliases:
+            - ${self:custom.config.public_bucket_name}
+          DefaultCacheBehavior:
+            TargetOriginId: "S3-${self:custom.config.public_bucket_name}"
+            ForwardedValues:
+              QueryString: false
+              Cookies:
+                Forward: none
+            ViewerProtocolPolicy: redirect-to-https
+          ViewerCertificate:
+            AcmCertificateArn: !Join ["", ["arn:aws:acm:us-east-1:", !Ref AWS::AccountId, ":certificate/", "${self:custom.config.acm_certificate_id}"]]
+            SslSupportMethod: sni-only            
+
     EphemeraPopulateStaticSiteConfigPermissionPublicBucketS3:
       Type: "AWS::Lambda::Permission"
       Properties:
