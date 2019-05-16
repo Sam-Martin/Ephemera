@@ -4,9 +4,14 @@ dynamodb_table_name: ephemera-${self:custom.config.stage}
 region: eu-west-2
 max_secret_age_hours: "24"
 
-# Provide a list of IP addresses to which Ephemera will be restricted (i.e. Your corporate office egress IP)
-# The default of 0.0.0.0/0 permits access from any host on the internet
-whitelisted_ips:
+# IP Restrictions For Ephemera
+# - `add_secret_whitelisted_ips` defines a list of IP Addresses which will be permitted to add secrets to Ephemera (i.e. Your corporate office egress IP(s))
+# - `get_secret_whitelisted_ips` defined a list of IP Addresses which will be permitted to retrieve secrets from Ephemera (i.e. Your corporate office egress / Customer / integration IP(s))
+# The default of 0.0.0.0/0 for both settings permits access from any host on the internet
+add_secret_whitelisted_ips:
+  - 0.0.0.0/0
+
+get_secret_whitelisted_ips:
   - 0.0.0.0/0
 
 # These settings enable HTTPS for the front-end Ephemera UI by fronting the S3 bucket with AWS CloudFront. The UI uses HTTP by default.
