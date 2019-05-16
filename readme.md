@@ -40,6 +40,11 @@ When uploading a text secret, the user submits the secret via a text box, the co
 ### Retrieving a Secret
 When a user clicks on a one-time URL, the JavaScript on the page recognises that the URL contains a GUID and then calls the API Gateway `getSecret` method submitting that GUID for retrieval. The return of this method includes the secret which is displayed for the user.
 
+## HTTPS Support
+Ephemera uses client-side JavaScript to connect over HTTPS to API Gateway for adding and accessing secrets. It is therefore not absolutely mandatory to enable HTTPS on the S3 website, but this can be done if desried using the `use_https_ui` setting in `config.yml`. This will additionally create an AWS CloudFront distribution to front the S3 Website and update the S3 Bucket Policy accordingly.
+
+**NOTE:** You will need to request or import an SSL Certificate in ACM in the `us-east-1` Region (See https://docs.aws.amazon.com/acm/latest/userguide/acm-regions.html) before enabling the HTTPS feature, and add the resultant ACM Certificate `Identifier` to the `acm_certificate_id` setting.
+
 ## Contributing
 Please feel free to submit pull requests of any type, whether they're bugfixes, test improvements, new features, anything!  
 Just make sure that if it necessitates a new AWS resource you represent it in the Terraform templates and that it does not require per hour services (e.g. EC2 or ECS).

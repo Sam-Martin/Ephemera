@@ -14,3 +14,9 @@ add_secret_whitelisted_ips:
 get_secret_whitelisted_ips:
   - 0.0.0.0/0
 
+# These settings enable HTTPS for the front-end Ephemera UI by fronting the S3 bucket with AWS CloudFront. The UI uses HTTP by default.
+# Pre-requsites:
+# - Create or import an SSL Certificate into the `us-east-1` (N. Virginia) Region - https://docs.aws.amazon.com/acm/latest/userguide/acm-regions.html
+# - Add the `Identifier` of the ACM Certificate (Not the full ARN) below
+use_https_ui: false
+acm_certificate_id: undefined
